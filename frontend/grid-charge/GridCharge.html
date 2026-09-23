@@ -1,0 +1,2291 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>[hidden]{display:none!important}html,body{margin:0}</style></head><body>
+<title>Grid Charge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Manrope:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,700;0,900;1,400&display=swap">
+<style>
+/* ============ GRID CHARGE — tokens ============ */
+:root{
+  --ink-950:#140d33;
+  --ink-900:#1a1240;
+  --ink-800:#241a58;
+  --ink-700:#2f2370;
+  --violet-600:#5b46b8;
+  --violet-500:#7660d4;
+  --violet-400:#9683e6;
+  --lav-300:#b7a8ef;
+  --lav-200:#d5ccf7;
+  --lav-100:#ebe6fc;
+  --cream:#fbf0da;
+  --cream-2:#f3e2ba;
+  --amber:#f5b041;
+  --orange:#e9822f;
+  --blue:#86a6f7;
+  --mint:#8fe3b9;
+  --gold:#f5c860;
+  --coral:#ff8f9a;
+
+  --tx:#f7f0ff;
+  --tx-2:rgba(228,220,252,.80);
+  --tx-3:rgba(204,193,242,.62);
+  --glass:rgba(255,255,255,.065);
+  --glass-2:rgba(255,255,255,.115);
+  --glass-line:rgba(255,255,255,.16);
+  --glass-line-2:rgba(255,255,255,.28);
+  --shadow:0 18px 50px -20px rgba(8,4,32,.65);
+
+  --f-display:'Merriweather', Georgia, 'Times New Roman', serif;
+  --f-body:'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono:'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  --r-lg:26px; --r-md:18px; --r-sm:12px;
+  --sidebar:272px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--ink-900); color:var(--tx);
+  font-family:var(--f-body); font-size:14px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3,h4,p{margin:0}
+h1,h2,h3{text-wrap:balance}
+a{color:inherit}
+svg{display:block}
+:focus-visible{outline:2px solid var(--cream);outline-offset:2px;border-radius:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--f-mono);font-size:.92em;letter-spacing:-.01em}
+
+/* ============ buttons / chips ============ */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;
+  padding:12px 22px;font-weight:700;font-size:14px;letter-spacing:.01em;
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:linear-gradient(135deg,#6a53c6,#3d2f8f);color:var(--cream);box-shadow:0 8px 24px -8px rgba(60,40,160,.9), inset 0 1px 0 rgba(255,255,255,.25)}
+.btn-primary:hover{box-shadow:0 10px 30px -6px rgba(118,96,212,.95), inset 0 1px 0 rgba(255,255,255,.3);transform:translateY(-1px)}
+.btn-cream{background:var(--cream);color:#3a2b85}
+.btn-cream:hover{background:#fff6e4;transform:translateY(-1px)}
+.btn-ghost{background:var(--glass);color:var(--tx);border:1px solid var(--glass-line)}
+.btn-ghost:hover{background:var(--glass-2)}
+.btn-sm{padding:8px 15px;font-size:12.5px}
+.btn svg{width:16px;height:16px}
+
+.chip{
+  display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;
+  font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+  border:1px solid var(--glass-line);background:var(--glass);color:var(--tx-2);white-space:nowrap;
+}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 0 0 currentColor;flex:none}
+.st-safe{color:var(--mint);border-color:rgba(143,227,185,.4);background:rgba(143,227,185,.10)}
+.st-warn{color:var(--gold);border-color:rgba(245,200,96,.45);background:rgba(245,200,96,.10)}
+.st-crit{color:var(--coral);border-color:rgba(255,143,154,.5);background:rgba(255,143,154,.11)}
+.st-info{color:var(--blue);border-color:rgba(134,166,247,.45);background:rgba(134,166,247,.10)}
+.st-mute{color:var(--tx-3)}
+.st-lav{color:var(--lav-200);border-color:rgba(183,168,239,.45);background:rgba(183,168,239,.12)}
+.st-safe .dot,.pulse .dot{animation:pulse 2.4s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 currentColor}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+
+/* ============ LANDING ============ */
+#landing{position:relative;background:var(--ink-900);overflow-x:hidden}
+.hero{position:relative;min-height:740px;isolation:isolate;overflow:hidden;padding:0 clamp(20px,5.6vw,100px)}
+.hero-art{position:absolute;inset:0;z-index:-2}
+.hero-art svg{width:100%;height:100%}
+.hero-shade{position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(90deg,rgba(38,26,96,.62) 0%,rgba(38,26,96,.34) 42%,transparent 66%),
+             linear-gradient(180deg,rgba(38,26,96,.28) 0,transparent 26%)}
+.hero-ring{position:absolute;inset:26px;border:2px solid rgba(255,255,255,.72);border-radius:46px;pointer-events:none;z-index:1}
+.hero-nav{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:24px;padding-top:62px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:#fff}
+.brand-mark{width:34px;height:34px;flex:none}
+.brand-name{font-family:var(--f-display);font-weight:900;font-size:19px;letter-spacing:.02em}
+.hero-links{display:flex;gap:44px}
+.hero-links a{font-weight:600;font-size:14.5px;color:#fff;text-decoration:none;opacity:.94;position:relative;padding:4px 0}
+.hero-links a::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--cream);transform:scaleX(0);transform-origin:left;transition:transform .25s}
+.hero-links a:hover::after,.hero-links a.on::after{transform:scaleX(1)}
+.hero-status{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:#fff}
+.hero-status .chip{background:rgba(26,18,64,.38);backdrop-filter:blur(8px);color:var(--mint)}
+.hero-body{position:relative;z-index:2;padding-top:clamp(58px,9vh,96px);padding-bottom:110px;max-width:760px}
+.hero h1{
+  font-family:var(--f-display);font-weight:900;color:#fffaf0;
+  font-size:clamp(2.3rem,5vw,4.35rem);line-height:1.13;letter-spacing:-.012em;
+  text-shadow:0 3px 30px rgba(30,16,90,.35);
+}
+.hero .tagline{margin-top:22px;font-family:var(--f-display);font-style:italic;font-weight:400;font-size:clamp(1.02rem,1.5vw,1.2rem);color:var(--cream)}
+.hero .desc{margin-top:10px;max-width:520px;font-size:clamp(.95rem,1.25vw,1.07rem);line-height:1.55;color:#fff;font-weight:500;opacity:.96}
+.cta-pill{
+  margin-top:28px;display:inline-flex;align-items:center;justify-content:space-between;gap:16px;
+  background:var(--cream);border-radius:999px;padding:7px 7px 7px 22px;width:min(100%,438px);
+  box-shadow:0 18px 40px -16px rgba(20,10,70,.7);
+}
+.cta-pill .lead{display:flex;align-items:center;gap:10px;color:#5a4d95;font-weight:600;font-size:14px}
+.cta-pill .lead svg{width:19px;height:19px;color:#7660d4;flex:none}
+.cta-pill .btn{padding:13px 24px;background:linear-gradient(135deg,#443590,#2a2170);color:var(--cream)}
+.cta-pill .btn:hover{background:linear-gradient(135deg,#5b46b8,#382c88)}
+.verbs{margin-top:20px;display:flex;flex-wrap:wrap;gap:8px 18px;font-weight:800;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--cream)}
+.verbs span{display:inline-flex;align-items:center;gap:18px}
+.verbs span+span::before{content:"";width:5px;height:5px;background:var(--amber);border-radius:50%;margin-right:0}
+
+.turb .blades{transform-origin:0 0;animation:spin 14s linear infinite}
+.turb.t2 .blades{animation-duration:11s}.turb.t3 .blades{animation-duration:17s}.turb.t4 .blades{animation-duration:12s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ff{animation:twinkle 3.6s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.25}50%{opacity:1}}
+.flow{stroke-dasharray:6 8;animation:dash 1.6s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-28}}
+.glowpulse{animation:glow 3s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.55}50%{opacity:1}}
+
+/* landing lower sections */
+.lsec{position:relative;padding:clamp(72px,9vw,120px) clamp(20px,5.6vw,100px);background:
+  radial-gradient(900px 500px at 85% 0,rgba(118,96,212,.35),transparent 60%),
+  radial-gradient(700px 500px at 0 100%,rgba(245,176,65,.07),transparent 60%),
+  linear-gradient(180deg,#3a2c86 0%,#241a58 55%,#1a1240 100%)}
+.lsec.alt{background:linear-gradient(180deg,#1a1240,#231a57)}
+.eyebrow{font-weight:800;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber)}
+.lsec h2{font-family:var(--f-display);font-weight:900;font-size:clamp(1.7rem,3.2vw,2.6rem);line-height:1.2;color:#fffaf0;margin-top:12px;max-width:720px}
+.lsec .lead{margin-top:14px;max-width:620px;color:var(--tx-2);font-size:16px;line-height:1.65}
+.pipeline{margin-top:46px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.pipe{position:relative;padding:26px 24px 28px;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(10px)}
+.pipe:first-child{border-radius:var(--r-lg) 0 0 var(--r-lg)}
+.pipe:last-child{border-radius:0 var(--r-lg) var(--r-lg) 0}
+.pipe+.pipe{border-left:0}
+.pipe .verb{font-family:var(--f-display);font-weight:900;font-size:1.45rem;color:var(--cream)}
+.pipe .verb small{display:block;font-family:var(--f-body);font-weight:700;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--lav-300);margin-bottom:8px}
+.pipe p{margin-top:10px;color:var(--tx-2);font-size:14px}
+.pipe .ic{position:absolute;right:20px;top:22px;width:34px;height:34px;color:var(--amber);opacity:.9}
+.pipe:not(:last-child)::after{content:"";position:absolute;right:-9px;top:50%;width:18px;height:18px;transform:translateY(-50%) rotate(45deg);background:#3a2c86;border-top:1px solid var(--glass-line-2);border-right:1px solid var(--glass-line-2);z-index:2}
+.eqn{margin-top:38px;background:var(--cream);color:#2c2168;border-radius:var(--r-lg);padding:28px 32px;display:flex;flex-wrap:wrap;align-items:center;gap:18px 40px;justify-content:space-between}
+.eqn .k{font-weight:800;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#7a63c9}
+.eqn .f{font-family:var(--f-display);font-weight:900;font-size:clamp(1.05rem,2.1vw,1.6rem);margin-top:6px}
+.eqn .ok{display:flex;align-items:center;gap:10px;font-weight:800;color:#2f8a5f}
+.feat-grid{margin-top:44px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.feat{padding:24px;border-radius:var(--r-lg);background:var(--glass);border:1px solid var(--glass-line);transition:transform .2s,background .2s,border-color .2s;text-decoration:none;display:block}
+.feat:hover{transform:translateY(-3px);background:var(--glass-2);border-color:var(--glass-line-2)}
+.feat .fi{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(150,131,230,.5),rgba(91,70,184,.3));color:var(--cream);border:1px solid var(--glass-line)}
+.feat .fi svg{width:22px;height:22px}
+.feat h3{margin-top:18px;font-family:var(--f-display);font-weight:700;font-size:1.08rem;color:var(--cream)}
+.feat p{margin-top:8px;color:var(--tx-2);font-size:14px;line-height:1.6}
+.closer{margin:0 auto;text-align:center;padding:54px 24px;border-radius:44px;border:2px solid rgba(255,255,255,.55);background:linear-gradient(135deg,rgba(118,96,212,.35),rgba(26,18,64,.4))}
+.closer h2{margin-inline:auto}
+.closer .btn{margin-top:26px}
+.lfoot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;margin-top:44px;color:var(--tx-3);font-size:13px}
+
+/* ============ APP SHELL ============ */
+#app{display:grid;grid-template-columns:var(--sidebar) minmax(0,1fr);min-height:100vh;position:relative;isolation:isolate}
+#app::before{content:"";position:fixed;inset:0;z-index:-1;
+  background:
+   radial-gradient(1100px 620px at 78% -8%,rgba(118,96,212,.50),transparent 62%),
+   radial-gradient(800px 520px at -6% 96%,rgba(91,70,184,.42),transparent 60%),
+   radial-gradient(520px 340px at 100% 100%,rgba(245,176,65,.09),transparent 65%),
+   linear-gradient(160deg,#2b2068 0%,#1e1550 46%,#160f3d 100%)}
+.side{
+  position:sticky;top:0;height:100vh;padding:20px 16px;display:flex;flex-direction:column;gap:6px;z-index:20;
+  background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.035));
+  border-right:1px solid var(--glass-line);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+}
+.side .brand{padding:6px 10px 2px}
+.side .sub{padding:0 10px 18px;font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--lav-300)}
+.nav-l{padding:12px 12px 6px;font-size:10.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--tx-3)}
+.nav{display:flex;flex-direction:column;gap:3px}
+.nav a{
+  position:relative;display:flex;align-items:center;gap:13px;padding:11px 14px;border-radius:14px;text-decoration:none;
+  color:var(--tx-2);font-weight:600;font-size:14px;transition:background .18s,color .18s;
+}
+.nav a svg{width:19px;height:19px;flex:none;opacity:.85}
+.nav a:hover{background:var(--glass);color:var(--tx)}
+.nav a.on{color:var(--cream);background:linear-gradient(90deg,rgba(150,131,230,.36),rgba(150,131,230,.08));box-shadow:inset 0 0 0 1px rgba(183,168,239,.32), 0 0 28px -6px rgba(150,131,230,.55)}
+.nav a.on::before{content:"";position:absolute;left:-16px;top:9px;bottom:9px;width:4px;border-radius:0 4px 4px 0;background:var(--cream);box-shadow:0 0 14px 2px rgba(251,240,218,.75)}
+.nav a.on svg{opacity:1;color:var(--amber)}
+.side-fill{flex:1}
+.nav-sep{height:1px;background:var(--glass-line);margin:10px 8px}
+.side-card{margin-top:10px;padding:14px;border-radius:var(--r-md);background:var(--glass);border:1px solid var(--glass-line)}
+.side-card .row{display:flex;justify-content:space-between;align-items:baseline}
+.side-card .l{font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--tx-3)}
+.side-card .v{font-weight:800;font-size:15px;color:var(--cream)}
+.mini-bar{margin-top:10px;height:6px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden}
+.mini-bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--violet-400),var(--cream))}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{
+  position:sticky;top:0;z-index:15;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  padding:16px clamp(16px,2.6vw,36px);border-bottom:1px solid var(--glass-line);
+  background:rgba(27,19,72,.62);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.tb-l{display:flex;align-items:center;gap:14px;min-width:0}
+.tb-menu{display:none;width:42px;height:42px;border-radius:12px;border:1px solid var(--glass-line);background:var(--glass);place-items:center}
+.tb-menu svg{width:20px;height:20px}
+.tb-title{font-family:var(--f-display);font-weight:900;font-size:clamp(1.25rem,2.2vw,1.65rem);line-height:1.15;color:#fffaf0}
+.tb-sub{margin-top:3px;font-size:13px;color:var(--tx-2);font-style:italic;font-family:var(--f-display);font-weight:400}
+.tb-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tb-clock{font-family:var(--f-mono);font-size:12.5px;color:var(--tx-2);padding:0 6px}
+.content{padding:clamp(16px,2.6vw,36px);display:flex;flex-direction:column;gap:22px;max-width:1560px;width:100%}
+.lead-p{color:var(--tx-2);font-size:15px;max-width:780px;line-height:1.65}
+.scrim{display:none}
+
+/* ============ cards / grids ============ */
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px}
+.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}.c2{grid-column:span 2}
+.card{
+  position:relative;padding:22px;border-radius:var(--r-lg);min-width:0;
+  background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.04));
+  border:1px solid var(--glass-line);box-shadow:var(--shadow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+.card.plain{background:var(--glass);box-shadow:none}
+.card.cream{background:var(--cream);color:#2c2168;border-color:transparent}
+.card.cream .k,.card.cream .tx2{color:#6c5cb3}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.card-t{font-weight:800;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--lav-300)}
+.card-s{margin-top:4px;color:var(--tx-2);font-size:13px}
+.k{font-size:10.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--tx-3)}
+.v{font-weight:800;color:var(--cream);font-variant-numeric:tabular-nums}
+.v-xl{font-size:clamp(1.9rem,2.8vw,2.55rem);line-height:1.05;letter-spacing:-.02em}
+.v-lg{font-size:1.5rem;letter-spacing:-.01em}
+.v-md{font-size:1.15rem}
+.u{font-size:.5em;font-weight:700;color:var(--lav-300);margin-left:5px;letter-spacing:0}
+.tx2{color:var(--tx-2)}.tx3{color:var(--tx-3)}
+.kpi{display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.kpi .k{display:flex;align-items:center;gap:8px}
+.kpi .k svg{width:16px;height:16px;color:var(--amber)}
+.kpi .note{font-size:13px;color:var(--tx-2)}
+.kpi .aside{position:absolute;right:16px;top:16px;opacity:.95}
+.kpi .foot{margin-top:auto;padding-top:8px}
+.bar{height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--violet-400),var(--lav-200))}
+.bar.amber i{background:linear-gradient(90deg,var(--orange),var(--amber))}
+.bar.mint i{background:linear-gradient(90deg,#4fc79a,var(--mint))}
+.bar.blue i{background:linear-gradient(90deg,#5b7fe0,var(--blue))}
+.stat-list{display:grid;gap:0}
+.stat{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:11px 0;border-bottom:1px dashed var(--glass-line)}
+.stat:last-child{border-bottom:0}
+.stat .k{flex:1}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.tile{padding:16px 18px;border-radius:var(--r-md);background:var(--glass);border:1px solid var(--glass-line)}
+.tile .v{margin-top:6px;font-size:1.45rem;letter-spacing:-.01em;display:block}
+.tile.hl{background:linear-gradient(135deg,rgba(150,131,230,.42),rgba(91,70,184,.22));border-color:var(--glass-line-2)}
+.tile.ok .v{color:var(--mint)}.tile.bad .v{color:var(--coral)}.tile.warn .v{color:var(--gold)}
+
+/* segmented control / inputs */
+.seg{display:inline-flex;padding:4px;border-radius:999px;background:rgba(20,13,51,.5);border:1px solid var(--glass-line);gap:2px}
+.seg button{border:0;background:transparent;padding:6px 14px;border-radius:999px;font-weight:800;font-size:12px;letter-spacing:.06em;color:var(--tx-2)}
+.seg button.on{background:var(--cream);color:#33267a}
+.seg button:not(.on):hover{color:#fff;background:var(--glass-2)}
+.field{display:flex;flex-direction:column;gap:7px;min-width:0}
+.field label{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--lav-300)}
+.inp,.sel{
+  width:100%;background:rgba(20,13,51,.55);border:1px solid var(--glass-line);border-radius:14px;padding:11px 14px;color:var(--tx);
+  transition:border-color .15s,box-shadow .15s;font-weight:600;
+}
+.inp::placeholder{color:var(--tx-3)}
+.inp:focus,.sel:focus{outline:0;border-color:var(--lav-300);box-shadow:0 0 0 3px rgba(183,168,239,.25)}
+.sel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23b7a8ef' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m1 1 5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.sel option{background:#241a58;color:#f7f0ff}
+.inp-unit{position:relative}
+.inp-unit .inp{padding-right:60px}
+.inp-unit span{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:800;color:var(--lav-300);pointer-events:none}
+.search{position:relative}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--lav-300)}
+.search .inp{padding-left:42px}
+.filters{display:grid;grid-template-columns:minmax(220px,1.5fr) repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;background:linear-gradient(90deg,var(--violet-400) var(--p,50%),rgba(255,255,255,.14) var(--p,50%));outline-offset:6px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--cream);border:3px solid var(--violet-500);box-shadow:0 0 0 4px rgba(183,168,239,.22),0 4px 10px rgba(0,0,0,.35);cursor:grab}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--cream);border:3px solid var(--violet-500);cursor:grab}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--glass-line);background:rgba(20,13,51,.30)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{position:sticky;top:0;text-align:left;padding:12px 14px;font-size:10.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--lav-300);background:rgba(36,26,88,.92);white-space:nowrap;border-bottom:1px solid var(--glass-line)}
+td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.07);white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--tx)}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:rgba(255,255,255,.06)}
+tbody tr.sel{background:rgba(150,131,230,.22);box-shadow:inset 3px 0 0 var(--cream)}
+tbody tr.click{cursor:pointer}
+tr:last-child td{border-bottom:0}
+td.wrap{white-space:normal;min-width:230px;max-width:340px;color:var(--tx-2)}
+.cellbar{display:flex;align-items:center;gap:9px;min-width:110px}
+.cellbar .bar{flex:1;height:6px}
+.cellbar b{font-weight:700;min-width:36px;text-align:right}
+.tbl-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;color:var(--tx-2);font-size:13px}
+.pager{display:flex;gap:6px}
+.pager button{min-width:36px;height:36px;padding:0 10px;border-radius:11px;border:1px solid var(--glass-line);background:var(--glass);font-weight:700}
+.pager button.on{background:var(--cream);color:#33267a;border-color:transparent}
+.pager button:disabled{opacity:.4;cursor:default}
+.empty{padding:36px;text-align:center;color:var(--tx-2)}
+.link{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--cream);background:none;border:0;padding:0;text-decoration:none}
+.link svg{width:15px;height:15px;transition:transform .2s}
+.link:hover svg{transform:translateX(4px)}
+
+/* charts */
+.chart{position:relative;width:100%}
+.chart svg{width:100%;overflow:visible}
+.chart text{font-family:var(--f-body);font-size:11px;fill:var(--tx-3);font-variant-numeric:tabular-nums}
+.tip{position:absolute;pointer-events:none;z-index:5;min-width:150px;padding:10px 12px;border-radius:12px;background:rgba(20,13,51,.94);border:1px solid var(--glass-line-2);box-shadow:0 12px 30px rgba(0,0,0,.45);font-size:12px;opacity:0;transition:opacity .12s}
+.tip .t{font-family:var(--f-mono);color:var(--lav-200);margin-bottom:6px}
+.tip .r{display:flex;justify-content:space-between;gap:14px;align-items:center}
+.tip .r i{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:7px}
+.tip .r b{font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-wrap:wrap;gap:8px}
+.legend button{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;border:1px solid var(--glass-line);background:var(--glass);font-size:12px;font-weight:700;color:var(--tx)}
+.legend button i{width:14px;height:4px;border-radius:9px;display:block}
+.legend button.off{opacity:.42;text-decoration:line-through}
+
+/* energy flow */
+.flowbox{position:relative}
+.flowbox svg{width:100%;height:auto;max-height:380px}
+.fnode{position:absolute;transform:translate(-50%,-50%);text-align:center;padding:10px 16px;border-radius:18px;background:#33277c;border:1px solid var(--glass-line-2);min-width:128px;z-index:2}
+.fnode .k{display:block}
+.fnode .v{font-size:1.3rem;display:block;margin-top:2px}
+.fnode .u{font-size:.6em}
+.fnode.solar{background:#3f2f6c;border-color:rgba(245,176,65,.6);box-shadow:0 0 30px -6px rgba(245,176,65,.6)}
+.fnode.solar .v{color:var(--amber)}
+.fnode.ev{background:#2f3a86;border-color:rgba(134,166,247,.6);box-shadow:0 0 30px -6px rgba(134,166,247,.55)}
+.fnode.ev .v{color:var(--blue)}
+.fctrl{position:absolute;transform:translate(-50%,-50%);text-align:center;width:min(200px,30%);aspect-ratio:1;border-radius:50%;display:grid;place-content:center;gap:2px;padding:10px;
+  z-index:3;background:radial-gradient(circle at 50% 35%,#7663d2,#503eae 60%,#33277f);
+  border:2px solid rgba(251,240,218,.7);box-shadow:0 0 0 10px rgba(183,168,239,.12),0 0 50px 4px rgba(150,131,230,.65)}
+.fctrl .n{font-weight:800;font-size:11px;letter-spacing:.15em;color:var(--cream)}
+.fctrl .n2{font-family:var(--f-display);font-weight:900;font-size:1.05rem;color:#fff}
+.fctrl .s{margin-top:4px;display:inline-flex;justify-content:center}
+.fctrl .ok{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--mint);margin-top:4px}
+
+/* meters */
+.capbar{position:relative;height:16px;border-radius:99px;background:rgba(255,255,255,.12);overflow:visible;margin:26px 0 8px}
+.capbar .fill{position:absolute;inset:0 auto 0 0;border-radius:99px;background:linear-gradient(90deg,var(--violet-500),var(--lav-200))}
+.capbar .fill.warn{background:linear-gradient(90deg,var(--orange),var(--gold))}
+.capbar .fill.crit{background:linear-gradient(90deg,#e0566a,var(--coral))}
+.capbar .mk{position:absolute;top:-22px;transform:translateX(-50%);font-size:11px;font-weight:800;color:var(--cream);white-space:nowrap}
+.capbar .mk::after{content:"";position:absolute;left:50%;top:18px;width:2px;height:24px;background:var(--cream);transform:translateX(-50%);border-radius:2px}
+.capbar-l{display:flex;justify-content:space-between;font-size:11px;color:var(--tx-3);font-weight:700}
+.cong{display:flex;gap:6px}
+.cong i{flex:1;height:8px;border-radius:9px;background:rgba(255,255,255,.12)}
+.cong i.on1{background:var(--mint)}.cong i.on2{background:var(--gold)}.cong i.on3{background:var(--coral)}
+
+/* activity timeline */
+.tl{display:flex;flex-direction:column;position:relative}
+.tl-i{display:grid;grid-template-columns:52px 20px 1fr;gap:10px;padding-bottom:18px;position:relative}
+.tl-i .t{font-family:var(--f-mono);font-size:12px;color:var(--lav-200);padding-top:1px}
+.tl-i .d{position:relative;display:flex;justify-content:center}
+.tl-i .d::before{content:"";position:absolute;top:16px;bottom:-20px;width:2px;background:linear-gradient(var(--glass-line-2),var(--glass-line));left:50%;transform:translateX(-50%)}
+.tl-i:last-child .d::before{display:none}
+.tl-i .d i{width:12px;height:12px;margin-top:4px;border-radius:50%;background:var(--violet-500);border:2px solid var(--cream);z-index:1}
+.tl-i.amber .d i{background:var(--amber)}.tl-i.blue .d i{background:var(--blue)}.tl-i.mint .d i{background:var(--mint)}
+.tl-i p{font-size:13.5px;color:var(--tx);line-height:1.5}
+.tl-i p em{display:block;font-style:normal;color:var(--tx-3);font-size:12.5px;margin-top:2px}
+.steps{display:flex;flex-direction:column}
+.step{display:grid;grid-template-columns:22px 1fr auto;gap:14px;align-items:start;padding-bottom:16px;position:relative}
+.step::before{content:"";position:absolute;left:10px;top:20px;bottom:0;width:2px;background:var(--glass-line-2)}
+.step:last-child::before{display:none}
+.step .n{width:22px;height:22px;border-radius:50%;background:var(--cream);color:#33267a;display:grid;place-items:center;font-size:11px;font-weight:800;z-index:1}
+.step.pend .n{background:transparent;border:2px dashed var(--glass-line-2);color:var(--tx-3)}
+.step b{display:block;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.step small{color:var(--tx-2);font-size:12.5px}
+.step time{font-family:var(--f-mono);font-size:12px;color:var(--lav-200)}
+
+/* factor bars */
+.factor{display:grid;grid-template-columns:150px 1fr 42px;gap:14px;align-items:center;padding:8px 0}
+.factor .k{color:var(--lav-200)}
+.factor .blocks{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.factor .blocks i{height:12px;border-radius:4px;background:rgba(255,255,255,.12)}
+.factor .blocks i.on{background:linear-gradient(180deg,var(--lav-200),var(--violet-500))}
+.factor b{font-variant-numeric:tabular-nums;text-align:right}
+.why{border-radius:var(--r-md);padding:16px 18px;background:rgba(251,240,218,.10);border:1px solid rgba(251,240,218,.35);font-family:var(--f-display);font-size:1.05rem;color:var(--cream);line-height:1.5}
+
+/* drawer */
+.drawer-wrap{position:fixed;inset:0;z-index:60;display:none}
+.drawer-wrap.open{display:block}
+.drawer-bg{position:absolute;inset:0;background:rgba(14,8,40,.6);backdrop-filter:blur(3px)}
+.drawer{position:absolute;right:0;top:0;bottom:0;width:min(760px,100%);overflow-y:auto;padding:26px;
+  background:linear-gradient(170deg,#2f2372,#1c1348);border-left:1px solid var(--glass-line-2);box-shadow:-30px 0 80px rgba(0,0,0,.5);
+  animation:slide .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes slide{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+.drawer-h{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:20px}
+.x-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--glass-line);background:var(--glass);display:grid;place-items:center;flex:none}
+.x-btn svg{width:18px;height:18px}
+.drawer h2{font-family:var(--f-display);font-weight:900;font-size:1.7rem;color:#fffaf0}
+.dsec{margin-top:24px}
+.dsec>.card-t{display:block;margin-bottom:12px}
+
+/* site assessment */
+.types{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.type{display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding:14px;border-radius:var(--r-md);border:1px solid var(--glass-line);background:var(--glass);text-align:left;font-weight:700;font-size:13px;transition:all .18s}
+.type svg{width:24px;height:24px;color:var(--lav-300)}
+.type:hover{background:var(--glass-2)}
+.type.on{background:var(--cream);color:#33267a;border-color:transparent;box-shadow:0 10px 30px -10px rgba(251,240,218,.5)}
+.type.on svg{color:#6a53c6}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.reco{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.reco .tile.big{grid-column:span 1}
+.split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:18px}
+.eq{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.eq .row{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.07);font-weight:700}
+.eq .op{text-align:center;color:var(--amber);font-weight:900;font-size:1.1rem;line-height:1}
+.eq .res{padding:14px;border-radius:14px;text-align:center;font-family:var(--f-display);font-weight:900;font-size:1.05rem}
+.eq .res.bad{background:rgba(255,143,154,.16);border:1px solid rgba(255,143,154,.5);color:var(--coral)}
+.eq .res.good{background:rgba(143,227,185,.14);border:1px solid rgba(143,227,185,.5);color:var(--mint)}
+.dist{display:flex;flex-direction:column;gap:14px}
+.dist .row{display:grid;grid-template-columns:110px 1fr 90px;gap:12px;align-items:center}
+.dist .bar{height:14px}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+.presets button{padding:8px 14px;border-radius:999px;border:1px solid var(--glass-line);background:var(--glass);font-weight:700;font-size:12.5px}
+.presets button:hover{background:var(--glass-2)}
+.slider{display:grid;gap:10px}
+.slider .top{display:flex;justify-content:space-between;align-items:baseline}
+.slider .top b{color:var(--cream);font-variant-numeric:tabular-nums;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.arch{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.arch .a{padding:18px;border-radius:var(--r-md);background:var(--glass);border:1px solid var(--glass-line);position:relative}
+.arch .a b{display:block;font-family:var(--f-display);font-size:1.1rem;color:var(--cream);margin:6px 0}
+.arch .a p{font-size:13px;color:var(--tx-2)}
+.arch .a:not(:last-child)::after{content:"→";position:absolute;right:-12px;top:50%;transform:translateY(-50%);font-weight:900;color:var(--amber);z-index:2;font-size:18px;background:#26196a;border-radius:50%;width:24px;height:24px;display:grid;place-items:center}
+.flow-map{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.flow-map span.n{padding:9px 16px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.flow-map span.n.hi{background:var(--cream);color:#33267a}
+.flow-map svg{width:16px;height:16px;color:var(--amber)}
+
+/* responsive */
+@media (max-width:1280px){
+  .c3{grid-column:span 6}
+  .c8:not(.keep),.c7,.c5,.c4:not(.keep){grid-column:span 12}
+}
+@media (max-width:980px){
+  #app{grid-template-columns:minmax(0,1fr)}
+  .side{position:fixed;left:0;top:0;bottom:0;width:min(300px,86vw);transform:translateX(-102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);background:linear-gradient(180deg,#2d2170,#1a1244);height:100%;overflow-y:auto}
+  body.nav-open .side{transform:none}
+  body.nav-open .scrim{display:block;position:fixed;inset:0;background:rgba(10,6,30,.6);z-index:19}
+  .tb-menu{display:grid}
+  .hero-links{display:none}
+  .pipeline{grid-template-columns:1fr 1fr}
+  .pipe:nth-child(2){border-radius:0 var(--r-lg) 0 0}.pipe:nth-child(3){border-radius:0 0 0 var(--r-lg);border-left:1px solid var(--glass-line)}
+  .pipe:first-child{border-radius:var(--r-lg) 0 0 0}.pipe:last-child{border-radius:0 0 var(--r-lg) 0}
+  .pipe:nth-child(3),.pipe:nth-child(4){border-top:0}
+  .pipe::after{display:none!important}
+  .arch{grid-template-columns:1fr 1fr}.arch .a::after{display:none!important}
+  .split{grid-template-columns:1fr}
+  .keep,.c6,.c4.keep,.c8.keep{grid-column:span 12}
+}
+@media (max-width:720px){
+  .c3,.c4,.c4.keep,.c2{grid-column:span 12}
+  .fnode{min-width:0;padding:8px 10px}.fnode .v{font-size:1rem}.fnode .k{font-size:9px;letter-spacing:.08em}
+  .fctrl{width:118px}.fctrl .n{font-size:8px}.fctrl .n2{font-size:.72rem}.fctrl .ok{font-size:8px}.fctrl .s .chip{font-size:8px;padding:2px 6px}
+  .hero{min-height:760px}
+  .hero-ring{inset:12px;border-radius:30px}
+  .hero-nav{padding-top:40px}
+  .hero-status .chip{display:none}
+  .hero-shade{background:linear-gradient(180deg,rgba(38,26,96,.55),rgba(38,26,96,.25) 60%,transparent)}
+  .cta-pill .lead span{display:none}
+  .cta-pill{width:auto;padding-left:14px}
+  .pipeline{grid-template-columns:1fr}
+  .pipe,.pipe:nth-child(n){border-radius:0;border:1px solid var(--glass-line);border-top:0}
+  .pipe:first-child{border-radius:var(--r-lg) var(--r-lg) 0 0;border-top:1px solid var(--glass-line)}
+  .pipe:last-child{border-radius:0 0 var(--r-lg) var(--r-lg)}
+  .arch{grid-template-columns:1fr}
+  .factor{grid-template-columns:1fr 1fr}.factor .blocks{grid-column:1/-1;order:3}
+  .dist .row{grid-template-columns:80px 1fr 74px}
+  .tb-clock{display:none}
+  .drawer{padding:18px}
+  .content{padding:14px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
+/* additions */
+.hero h1{max-width:min(100%,690px)}
+.flash{animation:flash 1.1s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 0 rgba(251,240,218,.7),var(--shadow)}100%{box-shadow:0 0 0 22px rgba(251,240,218,0),var(--shadow)}}
+#sess-detail,#dec-why,.card{scroll-margin-top:96px}
+.tb-title{margin:0}
+.lsec{scroll-margin-top:0}
+
+/* =====================================================================
+   LIGHT MULTI-COLOUR THEME
+   Applies to the app, the detail drawer and the landing sections below the hero.
+   The hero itself is untouched. Tokens are remapped so existing components adapt,
+   then the hard-coded dark-surface rules are overridden explicitly.
+   ===================================================================== */
+#app,#drawer,.lsec{
+  --tx:#2b2260; --tx-2:rgba(52,42,104,.80); --tx-3:rgba(78,68,130,.64);
+  --glass:rgba(255,255,255,.66); --glass-2:rgba(255,255,255,.96);
+  --glass-line:rgba(118,96,212,.17); --glass-line-2:rgba(118,96,212,.34);
+  --shadow:0 14px 34px -20px rgba(96,72,190,.38);
+  --cream:#2b2260; --lav-300:#6a53c6; --lav-200:#5a49b0; --lav-100:#4a3aa5;
+  --amber:#e8930f; --orange:#e2711d; --mint:#1f9d6b; --gold:#b7791f; --coral:#d1465a; --blue:#3d68d8;
+  --violet-400:#9a86e6;
+  /* pastel palette */
+  --p-lav:#ece5fd; --p-sky:#e0edff; --p-sun:#fff1d2; --p-mint:#dcf4e8; --p-rose:#fde4ec; --p-peach:#ffe9d6;
+}
+body{background:#f6f0fd}
+
+/* ---------- surfaces ---------- */
+#app::before{background:
+  radial-gradient(900px 520px at 88% -6%,rgba(154,134,230,.36),transparent 62%),
+  radial-gradient(760px 480px at -6% 100%,rgba(255,190,130,.32),transparent 62%),
+  radial-gradient(620px 420px at 62% 108%,rgba(120,190,240,.24),transparent 65%),
+  linear-gradient(160deg,#f3edfd 0%,#f9f2f5 50%,#fdf4e4 100%)}
+#app .side{background:linear-gradient(180deg,#ebe2fc 0%,#f5eefe 58%,#fdf1e3 100%);border-right:1px solid var(--glass-line);backdrop-filter:none}
+#app .brand{color:#3a2b85}
+#app .side .brand-mark{color:#6a53c6}
+#app .nav a{color:var(--tx-2)}
+#app .nav a:hover{background:rgba(255,255,255,.7);color:var(--tx)}
+#app .nav a.on{background:#fff;color:#4a3aa5;box-shadow:0 8px 22px -12px rgba(96,72,190,.55),inset 0 0 0 1px rgba(118,96,212,.22)}
+#app .nav a.on::before{background:linear-gradient(180deg,#9a86e6,#e0709a);box-shadow:0 0 12px rgba(154,134,230,.7)}
+#app .nav a svg{opacity:1}
+#app .nav:first-of-type a:nth-child(1) svg{color:#7660d4}
+#app .nav:first-of-type a:nth-child(2) svg{color:#3f8cf0}
+#app .nav:first-of-type a:nth-child(3) svg{color:#ef8a2b}
+#app .nav:first-of-type a:nth-child(4) svg{color:#d6579c}
+#app .nav:first-of-type a:nth-child(5) svg{color:#e0a10c}
+#app .nav:first-of-type a:nth-child(6) svg{color:#2fb37c}
+#app .nav:first-of-type a:nth-child(7) svg{color:#1fa5b8}
+#app .nav a[data-page=system] svg{color:#6a53c6}
+#app .nav a[data-page=about] svg{color:#3f8cf0}
+#app .nav a.on svg{color:inherit}
+#app .nav:first-of-type a.on:nth-child(1) svg{color:#7660d4}
+#app .nav-sep{background:var(--glass-line)}
+#app .side-card{background:#fff;border-color:var(--glass-line)}
+#app .mini-bar{background:rgba(118,96,212,.14)}
+#app .mini-bar i{background:linear-gradient(90deg,#9a86e6,#5aa2f2)}
+#app .topbar{background:rgba(255,255,255,.72);border-bottom:1px solid var(--glass-line)}
+#app .tb-title{color:#2b2260}
+#app .tb-clock{color:var(--tx-2)}
+#app .tb-menu{background:#fff}
+
+#app .card,#drawer .card{background:linear-gradient(165deg,rgba(255,255,255,.94),rgba(255,255,255,.72));border-color:var(--glass-line);box-shadow:var(--shadow);backdrop-filter:none}
+#app .card.plain,#drawer .card.plain{background:rgba(255,255,255,.62);box-shadow:none}
+#app .card.cream{background:linear-gradient(135deg,#fff1d4,#ffe6d0);color:#2b2260;border-color:transparent}
+#app .card.cream .k,#app .card.cream .tx2{color:#7a5a8a}
+#app .card.t-lav{background:linear-gradient(165deg,#e8dffd,#f5f0ff)}
+#app .card.t-sky{background:linear-gradient(165deg,#dbe9ff,#f0f6ff)}
+#app .card.t-sun{background:linear-gradient(165deg,#ffeec8,#fff8e6)}
+#app .card.t-mint{background:linear-gradient(165deg,#d5f2e5,#effaf4)}
+#app .card.t-rose{background:linear-gradient(165deg,#fddce8,#fff0f5)}
+#app .card.t-peach{background:linear-gradient(165deg,#ffe4cf,#fff4ea)}
+#app .kpi .k svg{width:17px;height:17px}
+#app .card.t-lav .k svg{color:#7660d4}#app .card.t-sky .k svg{color:#3f8cf0}#app .card.t-sun .k svg{color:#e0930a}#app .card.t-mint .k svg{color:#1f9d6b}
+
+/* tiles cycle through the palette */
+#app .tile,#drawer .tile{background:#fff;border-color:var(--glass-line)}
+#app .tiles>.tile:nth-child(5n+1),#drawer .tiles>.tile:nth-child(5n+1){background:var(--p-lav)}
+#app .tiles>.tile:nth-child(5n+2),#drawer .tiles>.tile:nth-child(5n+2){background:var(--p-sky)}
+#app .tiles>.tile:nth-child(5n+3),#drawer .tiles>.tile:nth-child(5n+3){background:var(--p-sun)}
+#app .tiles>.tile:nth-child(5n+4),#drawer .tiles>.tile:nth-child(5n+4){background:var(--p-mint)}
+#app .tiles>.tile:nth-child(5n+5),#drawer .tiles>.tile:nth-child(5n+5){background:var(--p-rose)}
+#app .reco>.tile:nth-child(6n+1){background:var(--p-lav)}#app .reco>.tile:nth-child(6n+2){background:var(--p-sky)}#app .reco>.tile:nth-child(6n+3){background:var(--p-sun)}
+#app .reco>.tile:nth-child(6n+4){background:var(--p-rose)}#app .reco>.tile:nth-child(6n+5){background:var(--p-mint)}#app .reco>.tile:nth-child(6n+6){background:var(--p-peach)}
+#app .tile.hl,#drawer .tile.hl{background:linear-gradient(135deg,#d9cbfb,#ece5fd);border-color:rgba(118,96,212,.35)}
+
+/* ---------- chips ---------- */
+#app .chip,#drawer .chip{background:rgba(255,255,255,.75);color:var(--tx-2);border-color:var(--glass-line)}
+#app .st-safe,#drawer .st-safe{color:#14805a;background:#daf3e7;border-color:rgba(31,157,107,.35)}
+#app .st-warn,#drawer .st-warn{color:#9a6208;background:#fff0cc;border-color:rgba(226,160,30,.45)}
+#app .st-crit,#drawer .st-crit{color:#c23350;background:#fde1e7;border-color:rgba(209,70,90,.4)}
+#app .st-info,#drawer .st-info{color:#2f5fd0;background:#deeaff;border-color:rgba(63,140,240,.4)}
+#app .st-lav,#drawer .st-lav{color:#5b46b8;background:#e9e1fc;border-color:rgba(118,96,212,.35)}
+#app .st-mute{color:var(--tx-3)}
+
+/* ---------- buttons, segmented, pager ---------- */
+#app .btn-cream,.lsec .btn-cream{background:linear-gradient(135deg,#8a74e0,#6650c8);color:#fff;box-shadow:0 10px 24px -10px rgba(102,80,200,.75)}
+#app .btn-cream:hover,.lsec .btn-cream:hover{background:linear-gradient(135deg,#9a86e6,#7660d4)}
+#app .seg,#drawer .seg{background:rgba(118,96,212,.10);border-color:var(--glass-line)}
+#app .seg button.on{background:linear-gradient(135deg,#8a74e0,#6650c8);color:#fff}
+#app .seg button:not(.on):hover{color:#4a3aa5;background:rgba(255,255,255,.8)}
+#app .pager button.on{background:linear-gradient(135deg,#8a74e0,#6650c8);color:#fff}
+#app .pager button,#app .presets button{background:#fff}
+#app .presets button:hover{background:var(--p-lav)}
+#app .link{color:#5a45b8}
+#app .type{background:#fff}
+#app .type:hover{background:var(--p-lav)}
+#app .type.on{background:linear-gradient(135deg,#8a74e0,#6650c8);color:#fff;box-shadow:0 12px 26px -12px rgba(102,80,200,.8)}
+#app .type.on svg{color:#fff}
+#app .type svg{color:#7660d4}
+#app .types .type:nth-child(4n+2) svg{color:#3f8cf0}#app .types .type:nth-child(4n+3) svg{color:#e0930a}#app .types .type:nth-child(4n+4) svg{color:#2fb37c}
+#app .types .type.on svg{color:#fff}
+
+/* ---------- forms ---------- */
+#app .inp,#app .sel{background:#fff;border-color:var(--glass-line-2);color:var(--tx)}
+#app .inp:focus,#app .sel:focus{border-color:#7660d4;box-shadow:0 0 0 3px rgba(118,96,212,.2)}
+#app .sel option{background:#fff;color:#2b2260}
+#app input[type=range]{background:linear-gradient(90deg,#8a74e0 var(--p,50%),rgba(118,96,212,.16) var(--p,50%))}
+#app input[type=range]::-webkit-slider-thumb{background:#fff;border-color:#7660d4}
+#app .search svg{color:#7660d4}
+
+/* ---------- bars & meters ---------- */
+#app .bar,#drawer .bar{background:rgba(118,96,212,.13)}
+#app .bar i,#drawer .bar i{background:linear-gradient(90deg,#9a86e6,#6f5bd0)}
+#app .bar.amber i{background:linear-gradient(90deg,#f39a2c,#f5c243)}
+#app .bar.mint i,#drawer .bar.mint i{background:linear-gradient(90deg,#33b783,#7fdcb0)}
+#app .bar.blue i{background:linear-gradient(90deg,#4a86e8,#7fb2f6)}
+#app .capbar{background:rgba(118,96,212,.14)}
+#app .capbar .fill{background:linear-gradient(90deg,#9a86e6,#5aa2f2)}
+#app .capbar .fill.warn{background:linear-gradient(90deg,#f39a2c,#f5c243)}
+#app .capbar .fill.crit{background:linear-gradient(90deg,#e0566a,#f08a98)}
+#app .capbar .mk{color:#2b2260}#app .capbar .mk::after{background:#2b2260}
+#app .cong i{background:rgba(118,96,212,.14)}
+#app .cong i.on1{background:#33b783}#app .cong i.on2{background:#f0b13a}#app .cong i.on3{background:#e5566b}
+#app .factor .blocks i{background:rgba(118,96,212,.13)}
+#app .factor .blocks i.on{background:linear-gradient(180deg,#b3a2f0,#7660d4)}
+#app .factor:nth-of-type(3) .blocks i.on{background:linear-gradient(180deg,#f7b26a,#e8842a)}
+#app .factor:nth-of-type(4) .blocks i.on{background:linear-gradient(180deg,#8cc0f8,#3f8cf0)}
+#app .factor:nth-of-type(5) .blocks i.on{background:linear-gradient(180deg,#7fdcb0,#2fb37c)}
+#app .factor:nth-of-type(6) .blocks i.on{background:linear-gradient(180deg,#f3a3c2,#d6579c)}
+#app .factor .k{color:#5a49b0}
+
+/* ---------- tables ---------- */
+#app .tbl-wrap,#drawer .tbl-wrap{background:rgba(255,255,255,.7);border-color:var(--glass-line)}
+#app th,#drawer th{background:#efe8fc;color:#5b46b8;border-bottom:1px solid var(--glass-line-2)}
+#app td,#drawer td{border-bottom:1px solid rgba(118,96,212,.10)}
+#app tbody tr:hover,#drawer tbody tr:hover{background:#f5f0ff}
+#app tbody tr.sel{background:#ece5fd;box-shadow:inset 3px 0 0 #7660d4}
+#app td.wrap{color:var(--tx-2)}
+
+/* ---------- lists, timelines, steps ---------- */
+#app .stat{border-bottom-color:rgba(118,96,212,.2)}
+#app .tl-i .d i{border-color:#fff;background:#7660d4;box-shadow:0 0 0 2px rgba(118,96,212,.25)}
+#app .tl-i.amber .d i{background:#f0a01c;box-shadow:0 0 0 2px rgba(240,160,28,.3)}
+#app .tl-i.blue .d i{background:#3f8cf0;box-shadow:0 0 0 2px rgba(63,140,240,.3)}
+#app .tl-i.mint .d i{background:#2fb37c;box-shadow:0 0 0 2px rgba(47,179,124,.3)}
+#app .tl-i .t{color:#5a49b0}
+#app .tl-i .d::before{background:rgba(118,96,212,.25)}
+#app .step::before{background:rgba(118,96,212,.28)}
+#app .step .n{background:linear-gradient(135deg,#8a74e0,#6650c8);color:#fff}
+#app .step.pend .n{background:transparent;border-color:rgba(118,96,212,.4);color:var(--tx-3)}
+#app .step time{color:#5a49b0}
+#app .why{background:#fff3d6;border-color:#f0d597;color:#3b2c6e}
+#app .eq .row{background:#fff}
+#app .eq .op{color:#e0930a}
+#app .eq .res.bad{background:#fde1e7;border-color:rgba(209,70,90,.45);color:#b62d49}
+#app .eq .res.good{background:#daf3e7;border-color:rgba(31,157,107,.45);color:#127a55}
+#app .arch .a{background:#fff}
+#app .arch .a:nth-child(1){background:var(--p-lav)}#app .arch .a:nth-child(2){background:var(--p-sky)}#app .arch .a:nth-child(3){background:var(--p-sun)}#app .arch .a:nth-child(4){background:var(--p-mint)}
+#app .arch .a:not(:last-child)::after{background:#fff;color:#7660d4;box-shadow:0 2px 8px rgba(96,72,190,.25)}
+#app .flow-map span.n{background:#fff}
+#app .flow-map span.n.hi{background:linear-gradient(135deg,#8a74e0,#6650c8);color:#fff}
+#app .legend button{background:#fff}
+
+/* ---------- energy flow ---------- */
+#app .fnode{background:var(--p-lav);border:1.5px solid rgba(118,96,212,.4);box-shadow:0 10px 22px -12px rgba(96,72,190,.5)}
+#app .fnode .v{color:#5b46b8}
+#app .fnode.solar{background:var(--p-sun);border-color:#f2b84a;box-shadow:0 10px 26px -10px rgba(242,165,28,.6)}
+#app .fnode.solar .v{color:#c97a06}
+#app .fnode.bld{background:var(--p-sky);border-color:#7fb0f5}#app .fnode.bld .v{color:#2a6ad0}
+#app .fnode.ev{background:var(--p-rose);border-color:#e58aab;box-shadow:0 10px 26px -10px rgba(214,87,156,.5)}
+#app .fnode.ev .v{color:#c2467c}
+#app .fctrl{background:radial-gradient(circle at 50% 28%,#b3a3f2,#8570e0 60%,#6d58cb);border:3px solid #fff;box-shadow:0 0 0 12px rgba(154,134,230,.2),0 14px 38px -6px rgba(118,96,212,.55)}
+#app .fctrl .n{color:#efe9ff}#app .fctrl .n2{color:#fff}#app .fctrl .ok{color:#d3fbe6}
+#app .fctrl .chip{background:rgba(255,255,255,.22);color:#e7ffef;border-color:rgba(255,255,255,.45)}
+
+/* ---------- drawer ---------- */
+#drawer .drawer{background:linear-gradient(170deg,#faf6ff,#f6efff 55%,#fff5e8);border-left:1px solid var(--glass-line-2);box-shadow:-24px 0 60px rgba(70,50,150,.28)}
+#drawer .drawer h2{color:#2b2260}
+#drawer .drawer-bg{background:rgba(60,44,120,.32);backdrop-filter:blur(2px)}
+#drawer .x-btn{background:#fff}
+#drawer .k{color:var(--tx-3)}
+.scrim{background:rgba(60,44,120,.35)}
+body.nav-open .scrim{background:rgba(60,44,120,.35)}
+.tip{color:#f7f0ff}.tip .t{color:#d5ccf7}
+
+/* =========================== landing sections =========================== */
+.lsec{background:
+  radial-gradient(820px 460px at 92% 0,rgba(154,134,230,.30),transparent 60%),
+  radial-gradient(700px 420px at 0 100%,rgba(255,190,130,.30),transparent 60%),
+  linear-gradient(180deg,#f1eafd,#f9f2f5 60%,#fdf3e3)}
+.lsec.alt{background:
+  radial-gradient(760px 440px at 8% 0,rgba(120,190,240,.24),transparent 60%),
+  radial-gradient(700px 420px at 100% 100%,rgba(154,134,230,.26),transparent 60%),
+  linear-gradient(180deg,#fdf3e3,#f3ecfd)}
+.lsec h2{color:#2b2260}
+.lsec .eyebrow{color:#c9770a}
+.lsec .lead{color:var(--tx-2)}
+.lsec .pipe{background:#fff;border-color:var(--glass-line);backdrop-filter:none}
+.lsec .pipe:nth-child(1){background:var(--p-lav)}.lsec .pipe:nth-child(2){background:var(--p-sky)}.lsec .pipe:nth-child(3){background:var(--p-sun)}.lsec .pipe:nth-child(4){background:var(--p-mint)}
+.lsec .pipe:nth-child(1) .ic{color:#7660d4}.lsec .pipe:nth-child(2) .ic{color:#3f8cf0}.lsec .pipe:nth-child(3) .ic{color:#e0930a}.lsec .pipe:nth-child(4) .ic{color:#2fb37c}
+.lsec .pipe:not(:last-child)::after{background:#fff;border-color:var(--glass-line-2)}
+.lsec .eqn{background:linear-gradient(135deg,#8a74e0,#a08cec 55%,#e79ac0);color:#fff;box-shadow:0 20px 44px -22px rgba(102,80,200,.7)}
+.lsec .eqn .k{color:#f1ebff}.lsec .eqn .f{color:#fff}.lsec .eqn .ok{color:#dcffe9}
+.lsec .feat{background:#fff;border-color:var(--glass-line);box-shadow:0 14px 30px -22px rgba(96,72,190,.5)}
+.lsec .feat:hover{background:#fff;border-color:var(--glass-line-2);box-shadow:0 20px 38px -20px rgba(96,72,190,.55)}
+.lsec .feat .fi{border:0}
+.lsec .feat:nth-child(7n+1) .fi{background:var(--p-lav);color:#6f58d0}
+.lsec .feat:nth-child(7n+2) .fi{background:var(--p-sky);color:#2f7be0}
+.lsec .feat:nth-child(7n+3) .fi{background:var(--p-sun);color:#d98a06}
+.lsec .feat:nth-child(7n+4) .fi{background:var(--p-rose);color:#cf4a8e}
+.lsec .feat:nth-child(7n+5) .fi{background:var(--p-mint);color:#22a06f}
+.lsec .feat:nth-child(7n+6) .fi{background:var(--p-peach);color:#e0701d}
+.lsec .feat:nth-child(7n+7) .fi{background:#dcf3f6;color:#1a9bb0}
+.lsec .closer{background:linear-gradient(135deg,#ebe2ff,#ffe9d6 60%,#dcecff);border:2px solid #fff;box-shadow:0 26px 60px -30px rgba(102,80,200,.55)}
+.lsec .lfoot{color:var(--tx-3)}
+
+/* inherited text colour must follow the remapped token, not the body's dark-theme value */
+#app,#drawer,.lsec{color:var(--tx)}
+.lsec .feat-grid{display:flex;flex-wrap:wrap;gap:18px}
+.lsec .feat{flex:1 1 250px}
+
+</style>
+<div id="landing">
+  <header class="hero" id="home">
+    <div class="hero-art" id="hero-art"></div>
+    <div class="hero-shade"></div>
+    <div class="hero-ring"></div>
+    <nav class="hero-nav" aria-label="Primary">
+      <a class="brand" href="#/" aria-label="Grid Charge home"><svg class="brand-mark" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="13" fill="none" stroke="currentColor" stroke-width="3.4" stroke-dasharray="64 18" stroke-linecap="round" transform="rotate(-72 17 17)"/><path d="M18.6 7.5 11 18.6h5.2L15.2 26.5 23 15.3h-5.2z" fill="#f5b041"/></svg><span class="brand-name">GRID CHARGE</span></a>
+      <div class="hero-links">
+        <a href="#home" class="on">Home</a>
+        <a href="#platform">Platform</a>
+        <a href="#features">Features</a>
+      </div>
+      <div class="hero-status"><span class="chip pulse st-safe"><i class="dot"></i>System safe · V5 look-ahead</span></div>
+    </nav>
+    <div class="hero-body">
+      <h1>Smart EV Charging &amp; Localized Grid Management</h1>
+      <p class="tagline">Every vehicle. Every kilowatt. Intelligently connected.</p>
+      <p class="desc">Grid Charge coordinates EV charging, building demand, grid capacity, and renewable energy using forecast-aware intelligent optimization.</p>
+      <div class="cta-pill">
+        <span class="lead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Open the live platform</span></span>
+        <a class="btn" href="#/command">Get Started <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="verbs" aria-label="Predict. Optimize. Balance. Charge."><span>Predict</span><span>Optimize</span><span>Balance</span><span>Charge</span></div>
+    </div>
+  </header>
+
+  <section class="lsec" id="platform">
+    <div class="eyebrow">The platform</div>
+    <h2>Not a charger dashboard. An energy intelligence platform.</h2>
+    <p class="lead">Instead of letting every EV charge on its own and stack up a large peak, Grid Charge weighs building demand, grid capacity, battery SOC, departure times and solar availability — then decides how much power each vehicle gets.</p>
+    <div class="pipeline">
+      <div class="pipe"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 18a9 9 0 1 1 16 0M12 13l4-4"/></svg><div class="verb"><small>Step 1</small>ML Predicts</div><p>Forecasts building demand, solar output and grid congestion six hours ahead.</p></div>
+      <div class="pipe"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1M15 4v4M9 10v4M17 16v4"/></svg><div class="verb"><small>Step 2</small>Optimization Decides</div><p>Scores every vehicle by urgency, SOC and grid slack, then allocates power every 15 minutes.</p></div>
+      <div class="pipe"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><div class="verb"><small>Step 3</small>Controller Acts</div><p>Sends set-points to each charger and keeps the site inside its grid limit.</p></div>
+      <div class="pipe"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg><div class="verb"><small>Step 4</small>Dashboard Explains</div><p>Shows every decision and the reason behind it, in plain language.</p></div>
+    </div>
+    <div class="eqn">
+      <div><div class="k">Core safety constraint</div><div class="f">Building Demand + EV Charging − Solar Generation ≤ Grid Limit</div></div>
+      <div class="ok"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>Enforced every interval</div>
+    </div>
+  </section>
+
+  <section class="lsec alt" id="features">
+    <div class="eyebrow">Features</div>
+    <h2>Two layers: plan the site, then run it.</h2>
+    <p class="lead">Site planning answers how much charging a location can safely support. Real-time operations answer how to charge the connected vehicles right now.</p>
+    <div class="feat-grid" id="feat-grid"></div>
+    <div class="closer" style="margin-top:64px">
+      <div class="eyebrow">Ready when you are</div>
+      <h2>See every kilowatt, intelligently connected.</h2>
+      <a class="btn btn-cream" href="#/command">Get Started <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="lfoot"><span>Grid Charge — Smart EV Charging &amp; Localized Grid Management</span><span>All figures shown are simulated demo data.</span></div>
+  </section>
+</div>
+
+<div id="app" hidden></div>
+<div class="scrim" data-act="menu"></div>
+<div id="drawer" class="drawer-wrap" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   GRID CHARGE — simulated backend
+   Everything the UI shows is served from here (never hard-coded in views):
+   fleet, sessions, decision log, time-series, forecast, status logic,
+   the what-if simulator and the site-assessment model.
+   ===================================================================== */
+const GC = (() => {
+  const mulberry = seed => () => {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const r1 = x => Math.round(x * 10) / 10;
+  const r2 = x => Math.round(x * 100) / 100;
+  const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+  const T = m => { m = ((Math.round(m) % 1440) + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+  const P = s => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
+
+  const NOW = 14 * 60 + 15;          // simulated "current" time 14:15
+  const LIMIT = 350;                 // site grid limit (kW)
+  const SITE = { name: 'Meridian Commons', kind: 'Mixed-Use Site', limit: LIMIT, transformer: '400 kVA' };
+
+  /* ---------------- live snapshot (+ demo override for status logic) ---------------- */
+  const BASE = { building: 126.2, solar: 128.4, ev: 184.6, gridImport: 182.4 };
+  let scenario = 'normal';
+  const setScenario = s => { scenario = s; };
+  const getScenario = () => scenario;
+  function snap() {
+    const s = { ...BASE, limit: LIMIT, violations: 0 };
+    if (scenario === 'constrained') s.gridImport = 296.4;
+    if (scenario === 'attention') { s.gridImport = 341.8; s.violations = 2; }
+    s.headroom = r1(LIMIT - s.gridImport);
+    s.util = r1((s.gridImport / LIMIT) * 100);
+    return s;
+  }
+  function status() {
+    const s = snap();
+    if (s.violations > 0 || s.util >= 90) return { key: 'attention', label: 'ATTENTION REQUIRED', cls: 'st-crit', tone: 'crit', msg: 'Grid limit at risk — review controller allocations' };
+    if (s.util >= 70) return { key: 'constrained', label: 'GRID CONSTRAINED', cls: 'st-warn', tone: 'warn', msg: 'Approaching capacity — controller is limiting EV allocations' };
+    return { key: 'safe', label: 'SYSTEM SAFE', cls: 'st-safe', tone: 'safe', msg: 'Operating within safe capacity' };
+  }
+
+  /* ---------------- 24h energy profile (5-minute resolution) ---------------- */
+  const bump = (h, c, w) => Math.exp(-Math.pow((h - c) / w, 2));
+  const solarF = h => Math.max(0, Math.cos((h - 12.5) * Math.PI / 12.6)) * 152 * (1 - .05 * Math.abs(Math.sin(h * 3.3)));
+  const bldF = h => 76 + 60 * bump(h, 13.5, 4.2) + 64 * bump(h, 19.5, 2) + 3 * Math.sin(h * 7.3) + 4 * Math.sin(h * 2.9 + 1);
+  const evF = h => {
+    const up = 1 / (1 + Math.exp(-(h - 7.6) * 2.2)), dn = 1 / (1 + Math.exp((h - 17.2) * 1.5));
+    return 20 + 168 * up * dn + 96 * bump(h, 19.6, 2.1) + 5 * Math.sin(h * 5.1);
+  };
+  const ufF = h => 1.25 + .7 * bump(h, 8.7, 1.1) + .75 * bump(h, 19.1, 1.6);
+  const nowH = NOW / 60;
+  const offB = BASE.building - bldF(nowH), offE = BASE.ev - evF(nowH), offS = BASE.solar - solarF(nowH);
+  const SERIES = (() => {
+    const out = [];
+    for (let i = 287; i >= 0; i--) {
+      const m = NOW - i * 5, h = ((m / 60) % 24 + 24) % 24, d = i / 12;
+      const building = Math.max(30, bldF(h) + offB * Math.exp(-d / 2.5));
+      const ev = Math.max(0, evF(h) + offE * Math.exp(-d / 2.5));
+      const solar = Math.max(0, solarF(h) + (solarF(h) > 1 ? offS * Math.exp(-d / 1.5) : 0));
+      const grid = Math.max(0, building + ev - solar);
+      const unc = Math.max(0, building + ev * ufF(h) - solar);
+      out.push({ t: T(m), building: r1(building), ev: r1(ev), solar: r1(solar), grid: r1(grid), unc: r1(unc), evU: r1(ev * ufF(h)), limit: LIMIT });
+    }
+    const last = out[out.length - 1];
+    Object.assign(last, { building: BASE.building, ev: BASE.ev, solar: BASE.solar, grid: BASE.gridImport, t: T(NOW) });
+    return out;
+  })();
+  const RANGE_N = { '1H': 12, '6H': 72, '12H': 144, '24H': 287 };
+  const profile = range => SERIES.slice(-(RANGE_N[range] + 1));
+  const sparkOf = (key, n = 24) => SERIES.slice(-n).map(p => p[key]);
+
+  function dayStats() {
+    const stepH = 5 / 60, N = SERIES.length;
+    const sum = k => SERIES.reduce((a, p) => a + p[k], 0) * stepH;
+    const gridE = sum('grid'), solarE = sum('solar'), bldE = sum('building'), evE = sum('ev');
+    const peak = k => Math.max(...SERIES.map(p => p[k]));
+    const solarUsed = Math.min(solarE, bldE + evE) * .94;
+    const overU = SERIES.filter(p => p.unc > LIMIT), overC = SERIES.filter(p => p.grid > LIMIT);
+    const safeIntervals = SERIES.filter((p, i) => i % 3 === 0 && p.grid <= LIMIT).length;
+    const totalIntervals = SERIES.filter((p, i) => i % 3 === 0).length;
+    return {
+      gridE: r1(gridE), solarE: r1(solarE), bldE: r1(bldE), evE: r1(evE),
+      solarUsed: r1(solarUsed), gridUsed: r1(gridE),
+      renewShare: Math.round((solarUsed / (bldE + evE)) * 100),
+      solarUtil: Math.round((solarUsed / solarE) * 100),
+      peakEV: r1(peak('ev')), peakCtrl: r1(peak('grid')), peakUnc: r1(peak('unc')),
+      ctrlOverload: overC.length ? r1(Math.max(...overC.map(p => p.grid - LIMIT))) : 0,
+      uncOverload: overU.length ? r1(Math.max(...overU.map(p => p.unc - LIMIT))) : 0,
+      safeIntervals, totalIntervals, safety: Math.round((safeIntervals / totalIntervals) * 100)
+    };
+  }
+
+  /* ---------------- forecast monitor ---------------- */
+  const FORECAST = [
+    { h: 'NEXT 15 MINUTES', k: '15M', building: 178.4, capacity: 68.2, level: 'MEDIUM', ev: 171.2, solar: 121.6 },
+    { h: 'NEXT HOUR', k: '1H', building: 168.0, capacity: 92.5, level: 'MEDIUM', ev: 164.0, solar: 104.2 },
+    { h: 'NEXT 3 HOURS', k: '3H', building: 141.3, capacity: 150.4, level: 'LOW', ev: 122.5, solar: 38.7 },
+    { h: 'NEXT 6 HOURS', k: '6H', building: 152.9, capacity: 118.6, level: 'LOW', ev: 96.4, solar: 0 }
+  ];
+
+  /* ---------------- fleet + sessions ---------------- */
+  const PIN = {
+    1: { soc: 33, target: 90, dep: '15:00', arr: '08:30', cap: 60 },
+    2: { soc: 43, target: 80, dep: '16:15', arr: '08:45', cap: 52 },
+    3: { soc: 53, target: 80, dep: '17:30', arr: '09:00', cap: 64 },
+    4: { soc: 63, target: 80, dep: '18:45', arr: '09:30', cap: 75 },
+    8: { soc: 46, target: 90, dep: '15:45', arr: '09:45', cap: 60 },
+    21: { soc: 58, target: 85, dep: '17:15', arr: '10:15', cap: 64 },
+    23: { soc: 41, target: 90, dep: '16:30', arr: '09:00', cap: 60, completion: 72, max: 7.2 },
+    24: { soc: 85, target: 90, dep: '15:30', arr: '09:15', cap: 56, init: 28 }
+  };
+  const UNMET = [9.10, 8.03, 5.50];
+  const CH = ['Charging'];
+
+  function buildFleet(seed) {
+    const r = mulberry(seed), pick = a => a[Math.floor(r() * a.length)];
+    const pinned = new Set([1, 2, 3, 4, 8, 21, 23, 24, 50]);
+    const pool = []; for (let i = 1; i <= 50; i++) if (!pinned.has(i)) pool.push(i);
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    const status = {}; pool.slice(0, 18).forEach((id, k) => { status[id] = k < 10 ? 'Complete' : k < 16 ? 'Queued' : 'Paused'; });
+    const completeIds = pool.slice(0, 10);
+    const evs = [];
+    for (let id = 1; id <= 50; id++) {
+      const p = PIN[id] || {}, st = status[id] || 'Charging';
+      const cap = p.cap || pick([40, 52, 56, 60, 64, 75, 82]);
+      const target = p.target || pick([80, 80, 90, 90, 100]);
+      let arr, dep;
+      if (st === 'Queued') { arr = 13 * 60 + 45 + Math.floor(r() * 3) * 15; dep = 18 * 60 + Math.floor(r() * 9) * 15; }
+      else if (st === 'Complete') { arr = 7 * 60 + Math.floor(r() * 12) * 15; dep = 15 * 60 + Math.floor(r() * 16) * 15; }
+      else { arr = 7 * 60 + Math.floor(r() * 22) * 15; dep = NOW + 45 + Math.floor(r() * 21) * 15; }
+      if (p.arr) arr = P(p.arr); if (p.dep) dep = P(p.dep);
+      let init = p.init || Math.round(12 + r() * 26), soc;
+      if (p.soc != null) soc = p.soc;
+      else if (st === 'Complete') soc = target;
+      else if (st === 'Queued') soc = init = Math.round(14 + r() * 26);
+      else soc = Math.round(clamp(init + 14 + r() * 34, 25, target - 6));
+      if (!p.init && st !== 'Queued' && st !== 'Complete') init = Math.min(init, soc - 8);
+      const ev = {
+        n: id, id: 'EV-' + String(id).padStart(3, '0'), status: st, cap, target, soc, init,
+        arr, dep, max: p.max || (r() < .18 ? 11 : 7.2), power: 0, missed: false, unmet: 0
+      };
+      evs.push(ev);
+    }
+    // deadline-missed sessions (part of the "complete" bucket)
+    completeIds.slice(0, 3).forEach((id, k) => {
+      const ev = evs[id - 1]; ev.cap = Math.max(ev.cap, 60); ev.init = 14 + k * 4; ev.target = 90; ev.missed = true; ev.unmet = UNMET[k];
+      ev.soc = ev.target - Math.round(UNMET[k] / ev.cap * 1000) / 10;
+    });
+    // charging power: pinned 5.8 kW, remainder normalised so the fleet sums to exactly 184.6 kW
+    const charging = evs.filter(e => e.status === 'Charging');
+    const fixed = charging.filter(e => [1, 2, 3, 4, 23].includes(e.n));
+    fixed.forEach(e => e.power = 5.8);
+    const free = charging.filter(e => !fixed.includes(e));
+    let raw = free.map(() => 4.4 + r() * 2.4);
+    const want = 184.6 - fixed.length * 5.8, k = want / raw.reduce((a, b) => a + b, 0);
+    free.forEach((e, i) => e.power = r1(raw[i] * k));
+    const diff = r1(want - free.reduce((a, e) => a + e.power, 0)); free[free.length - 1].power = r1(free[free.length - 1].power + diff);
+    // derived fields
+    evs.forEach(e => {
+      e.required = r1((e.target - e.soc) / 100 * e.cap);
+      e.sessionReq = r1((e.target - e.init) / 100 * e.cap);
+      e.delivered = e.status === 'Queued' ? 0 : r1((e.soc - e.init) / 100 * e.cap);
+      const span = Math.max(1, e.target - e.init);
+      e.completion = e.n === 23 ? 72 : e.status === 'Queued' ? 0 : clamp(Math.round((e.soc - e.init) / span * 100), 0, 100);
+      const hrs = (e.dep - NOW) / 60;
+      e.urgency = e.status === 'Complete' ? 'Done' : hrs < 2 ? 'High' : hrs < 4 ? 'Medium' : 'Low';
+      e.priority = e.status === 'Complete' ? '—' : e.urgency === 'High' ? 'High' : e.urgency === 'Medium' ? 'Medium' : 'Low';
+      if (e.n === 8 || e.n === 23) e.priority = 'High';
+      e.sessionId = 'S-' + (1000 + e.n);
+      e.sessionStatus = e.status === 'Complete' ? (e.missed ? 'Deadline Missed' : 'Completed') : e.status;
+    });
+    // hit 974.9 kWh total delivered by solving EV-050's initial SOC
+    const e50 = evs[49], others = evs.filter(e => e !== e50).reduce((a, e) => a + e.delivered, 0);
+    const need = 974.9 - others, init50 = e50.soc - need / e50.cap * 100;
+    if (!(init50 >= 4 && init50 <= e50.soc - 8)) return null;
+    e50.init = init50; e50.sessionReq = r1((e50.target - e50.init) / 100 * e50.cap); e50.delivered = r1(need);
+    e50.completion = clamp(Math.round((e50.soc - e50.init) / (e50.target - e50.init) * 100), 0, 100);
+    return evs;
+  }
+  let FLEET = null;
+  for (let s = 11; !FLEET && s < 3000; s++) FLEET = buildFleet(s);
+
+  const by = id => FLEET.find(e => e.id === id);
+
+  /* per-EV history: charging power + SOC over the session */
+  const histCache = {};
+  function history(ev) {
+    if (histCache[ev.id]) return histCache[ev.id];
+    if (ev.status === 'Queued') return (histCache[ev.id] = { t: [], p: [], soc: [] });
+    const r = mulberry(ev.n * 7919), end = Math.min(NOW, ev.dep), t = [], raw = [];
+    const k = Math.max(3, Math.floor((end - ev.arr) / 15) + 1);
+    const active = ev.status === 'Complete' ? Math.max(3, Math.round(k * .62)) : k;
+    for (let i = 0; i < k; i++) {
+      t.push(ev.arr + i * 15);
+      let v = i < active ? (ev.max * .55 + r() * ev.max * .4) * (i === 0 ? .6 : 1) : 0;
+      if (i >= active - 2 && i < active && ev.status === 'Complete') v *= .5;
+      raw.push(v);
+    }
+    const last = ev.status === 'Charging' ? ev.power : raw[k - 1];
+    if (ev.status === 'Charging') raw[k - 1] = last;
+    const tgt = ev.delivered / .25, rest = raw.reduce((a, b) => a + b, 0) - (ev.status === 'Charging' ? last : 0);
+    const scale = ev.status === 'Charging' ? Math.max(.2, (tgt - last) / (rest || 1)) : tgt / (rest || 1);
+    const p = raw.map((v, i) => r1(Math.min(ev.max, (ev.status === 'Charging' && i === k - 1) ? v : v * scale)));
+    let e = 0; const soc = p.map(v => { e += v * .25; return r1(Math.min(100, ev.init + e / ev.cap * 100)); });
+    soc[k - 1] = ev.soc; if (ev.status === 'Charging') p[k - 1] = ev.power;
+    return (histCache[ev.id] = { t: t.map(T), p, soc });
+  }
+
+  /* ---------------- decision log ---------------- */
+  const FACTOR_KEYS = ['soc', 'urgency', 'energy', 'slack', 'congestion'];
+  const FACTOR_LABEL = { soc: 'SOC', urgency: 'Departure urgency', energy: 'Energy requirement', slack: 'Grid slack', congestion: 'Forecast congestion' };
+  const PHRASE = { soc: 'low SOC', urgency: 'high urgency', energy: 'large energy requirement', slack: 'tight grid slack', congestion: 'increasing forecast congestion' };
+  const reasonOf = f => {
+    const top = [...FACTOR_KEYS].sort((a, b) => f[b] - f[a]).slice(0, 3).map(k => PHRASE[k]);
+    const s = top.join(' + '); return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+  const DECISIONS = (() => {
+    const r = mulberry(4242), ch = FLEET.filter(e => e.status === 'Charging'), rows = [];
+    for (let i = 0; i < 48; i++) {
+      const m = NOW - i * 5 - (i % 3), ev = i === 0 ? by('EV-023') : ch[Math.floor(r() * ch.length)];
+      const f = i === 0 ? { soc: .8, urgency: .9, energy: .7, slack: .6, congestion: .8 }
+        : { soc: r2(.25 + r() * .7), urgency: r2(.2 + r() * .78), energy: r2(.2 + r() * .7), slack: r2(.15 + r() * .75), congestion: r2(.2 + r() * .72) };
+      const fb = r1(140 + r() * 60), cap = r1(30 + r() * 150), comp = r1(120 + r() * 80);
+      const score = i === 0 ? .91 : r2(.28 * f.soc + .27 * f.urgency + .15 * f.energy + .12 * f.slack + .18 * f.congestion + .04);
+      const congestion = i === 0 ? 'MEDIUM' : cap < 55 ? 'HIGH' : cap < 105 ? 'MEDIUM' : 'LOW';
+      const slack = r1((ev.dep - m) / 60 - ev.required / (ev.max * .8));
+      rows.push({
+        i, t: T(m), ev: ev.id, soc: ev.soc, reqAvg: r1(ev.required / Math.max(.5, (ev.dep - m) / 60)), slack: Math.max(0.2, slack),
+        fbBuilding: i === 0 ? 178.4 : fb, fbCap: i === 0 ? 68.2 : cap, comp: r1(comp), congestion,
+        feas: slack > 1.6 ? 'Feasible' : slack > .7 ? 'Tight' : 'At risk', urg: r2(f.urgency), score,
+        alloc: i === 0 ? 5.8 : r1(Math.min(ev.max, 3.4 + score * 3.6)), factors: f, reason: reasonOf(f)
+      });
+    }
+    return rows;
+  })();
+
+  /* ---------------- backend V5 optimisation results ---------------- */
+  const stats = dayStats();
+  const OPT = {
+    version: 'V5', strategy: 'LOOK-AHEAD', horizon: '6 HOURS', interval: '15 MINUTES', decisions: 1186,
+    forecastDecisions: 742, avgCompletion: 98.3, unmet: 22.63, deadlineMisses: 3,
+    peakEV: stats.peakEV, peakSite: stats.peakCtrl, safeIntervals: stats.safeIntervals, totalIntervals: stats.totalIntervals
+  };
+  const ALLOC_TIMELINE = [
+    { t: '08:00', ev: 'EV-001', p: 5.8 }, { t: '08:15', ev: 'EV-001', p: 5.2 },
+    { t: '08:30', ev: 'EV-003', p: 6.0 }, { t: '08:45', ev: 'EV-008', p: 4.2 }
+  ];
+  const allocSeries = (() => {
+    const r = mulberry(99), ids = ['EV-001', 'EV-003', 'EV-008', 'EV-021'], out = { t: [], s: ids.map(() => []) };
+    for (let m = P('08:00'); m <= NOW; m += 15) {
+      out.t.push(T(m));
+      ids.forEach((id, k) => {
+        const prev = out.s[k].length ? out.s[k][out.s[k].length - 1] : 5.8;
+        const dip = bump(m / 60, 12.5 + k * .6, 1.2) * 1.4;
+        out.s[k].push(r1(clamp(prev + (r() - .5) * 1.1 - (dip * .1) + (5.8 - prev) * .12, 3.2, 7.2)));
+      });
+    }
+    out.s[0][0] = 5.8; out.s[0][1] = 5.2; out.s[1][2] = 6.0; out.s[2][3] = 4.2; out.ids = ids;
+    return out;
+  })();
+
+  const ACTIVITY = [
+    { t: '14:15', tone: 'amber', a: 'EV-021 allocation adjusted', b: 'due to rising building demand.' },
+    { t: '14:00', tone: 'amber', a: 'Solar availability increased.', b: 'Solar share of demand rose to 41%.' },
+    { t: '13:45', tone: 'blue', a: 'EV-008 prioritized because', b: 'of approaching departure.' },
+    { t: '13:30', tone: 'mint', a: 'Grid utilization increased.', b: 'Look-ahead controller adjusted EV allocations.' },
+    { t: '13:15', tone: 'mint', a: 'EV-031 session completed', b: 'at target SOC 80%.' },
+    { t: '13:00', tone: 'blue', a: '6 vehicles queued', b: 'while forecast congestion cleared.' }
+  ];
+
+  /* ---------------- fleet aggregates ---------------- */
+  function fleetStats() {
+    const c = { Charging: 0, Complete: 0, Queued: 0, Paused: 0 };
+    FLEET.forEach(e => c[e.status]++);
+    const avg = k => FLEET.reduce((a, e) => a + e[k], 0) / FLEET.length;
+    return {
+      total: FLEET.length, ...c, avgSoc: Math.round(avg('soc')), avgCompletion: Math.round(avg('completion')),
+      required: r1(FLEET.reduce((a, e) => a + e.required, 0)), delivered: r1(FLEET.reduce((a, e) => a + e.delivered, 0)),
+      power: r1(FLEET.reduce((a, e) => a + e.power, 0))
+    };
+  }
+  function sessionStats() {
+    const fs = fleetStats(), act = FLEET.filter(e => e.status === 'Charging');
+    const dur = FLEET.filter(e => e.status !== 'Queued').map(e => (Math.min(NOW, e.dep) - e.arr) / 60);
+    return {
+      connected: fs.Charging, active: fs.Charging, completed: fs.Complete, queued: fs.Queued, paused: fs.Paused,
+      missed: FLEET.filter(e => e.missed).length, energy: fs.delivered,
+      avgDur: dur.reduce((a, b) => a + b, 0) / dur.length,
+      avgPower: r1(act.reduce((a, e) => a + e.power, 0) / act.length),
+      avgCompletion: Math.round(FLEET.filter(e => e.status !== 'Queued').reduce((a, e) => a + e.completion, 0) / FLEET.filter(e => e.status !== 'Queued').length)
+    };
+  }
+  function sessionDetail(ev) {
+    const r = mulberry(ev.n * 31), solarShare = ev.n === 24 ? .43 : r2(.3 + r() * .2);
+    const remainingH = ev.status === 'Charging' ? ev.required / Math.max(ev.power, .1) : 0;
+    const eta = ev.status === 'Charging' ? NOW + remainingH * 60 : null;
+    const fin = ev.status === 'Complete' ? Math.min(ev.dep, ev.arr + Math.max(90, Math.round(ev.sessionReq / (ev.max * .7) * 60))) : null;
+    return {
+      solarShare, gridShare: r2(1 - solarShare), solarE: r1(ev.delivered * solarShare), gridE: r1(ev.delivered * (1 - solarShare)),
+      remainingH, eta, fin,
+      deadline: ev.status === 'Queued' ? 'Pending' : ev.status === 'Complete' ? (ev.missed ? 'Missed' : 'Met') : eta != null && eta > ev.dep ? 'At risk' : ev.status === 'Paused' ? 'At risk' : 'On track',
+      adjustments: 4 + Math.floor(r() * 14)
+    };
+  }
+  function optHistory(ev) {
+    const h = history(ev), r = mulberry(ev.n * 17), rows = [];
+    const n = Math.min(6, h.t.length);
+    for (let k = 0; k < n; k++) {
+      const idx = h.t.length - 1 - k, f = { soc: r2(.3 + r() * .6), urgency: r2(.3 + r() * .65), energy: r2(.3 + r() * .6), slack: r2(.2 + r() * .6), congestion: r2(.25 + r() * .65) };
+      const cong = f.congestion > .7 ? 'HIGH' : f.congestion > .45 ? 'MEDIUM' : 'LOW';
+      rows.push({ t: h.t[idx], p: h.p[idx], prio: r2(.28 * f.soc + .27 * f.urgency + .15 * f.energy + .12 * f.slack + .18 * f.congestion + .05), cond: `Congestion ${cong} · headroom ${r1(40 + r() * 140)} kW`, reason: reasonOf(f) });
+    }
+    return rows;
+  }
+
+  /* ---------------- what-if simulator (real, 15-min steps) ---------------- */
+  function simulate(o) {
+    const r = mulberry(2026), steps = 96, dt = .25, evs = [];
+    for (let i = 0; i < o.evs; i++) {
+      const arr = clamp(Math.round(38 + (r() + r() + r() - 1.5) * 12), 26, 62);
+      const dwell = clamp(Math.round(30 + (r() - .5) * 20), 14, 46);
+      evs.push({ arr, dep: Math.min(95, arr + dwell), need: 8 + r() * 30, max: o.maxP, left: 0 });
+      evs[i].left = evs[i].need; evs[i].left2 = evs[i].need;
+    }
+    const bld = new Array(steps), sol = new Array(steps);
+    for (let s = 0; s < steps; s++) { const h = s / 4; bld[s] = (76 + 60 * bump(h, 13.5, 4.2) + 64 * bump(h, 19.5, 2)) * o.bld / 100; sol[s] = Math.max(0, Math.cos((h - 12.5) * Math.PI / 12.6)) * o.solar * .93; }
+    const unc = new Array(steps).fill(0), ctl = new Array(steps).fill(0), evU = new Array(steps).fill(0), evC = new Array(steps).fill(0);
+    let solarUsedC = 0;
+    for (let s = 0; s < steps; s++) {
+      // uncontrolled: everyone charges flat-out on arrival
+      let pu = 0; evs.forEach(e => { if (s >= e.arr && s < e.dep && e.left2 > 0) { const p = Math.min(e.max, e.left2 / dt); e.left2 -= p * dt; pu += p; } });
+      evU[s] = pu; unc[s] = bld[s] + pu - sol[s];
+      // controlled: allocate within headroom, most urgent (highest required average power) first
+      const head = Math.max(0, o.limit - (bld[s] - sol[s]));
+      const act = evs.filter(e => s >= e.arr && s < e.dep && e.left > 0).map(e => ({ e, req: Math.min(e.max, e.left / (Math.max(1, e.dep - s) * dt)) })).sort((a, b) => b.req / b.e.max - a.req / a.e.max);
+      let used = 0;
+      act.forEach(a => { const p = Math.min(a.req, head - used); if (p > 0) { a.p = p; used += p; } else a.p = 0; });
+      act.forEach(a => { const extra = Math.min(a.e.max - a.p, head - used); if (extra > 0) { a.p += extra; used += extra; } });
+      act.forEach(a => { a.act = Math.min(a.p, a.e.max, a.e.left / dt); a.e.left -= a.act * dt; });
+      const pc = act.reduce((x, a) => x + a.act, 0);
+      evC[s] = pc; ctl[s] = bld[s] + pc - sol[s]; solarUsedC += Math.min(sol[s], bld[s] + pc) * dt;
+    }
+    const clip = a => a.map(v => Math.max(0, v));
+    const c = clip(ctl), u = clip(unc);
+    const solarAvail = sol.reduce((a, v) => a + v * dt, 0);
+    const unmet = evs.reduce((a, e) => a + Math.max(0, e.left), 0), missed = evs.filter(e => e.left > .5).length;
+    const eps = .05, overU = u.filter(v => v > o.limit + eps).length, overC = c.filter(v => v > o.limit + eps).length;
+    return {
+      t: Array.from({ length: steps }, (_, s) => T(s * 15)), ctl: c.map(r1), unc: u.map(r1), bld: bld.map(r1), sol: sol.map(r1),
+      limit: new Array(steps).fill(o.limit), evC: evC.map(r1), evU: evU.map(r1),
+      peakC: r1(Math.max(...c)), peakU: r1(Math.max(...u)), overloadU: r1(Math.max(0, Math.max(...u) - o.limit)), overloadC: r1(Math.max(0, Math.max(...c) - o.limit - eps)),
+      safeC: steps - overC, safeU: steps - overU, steps, unmet: r1(unmet), missed,
+      demand: r1(evs.reduce((a, e) => a + e.need, 0)), solarUtil: solarAvail ? Math.round(solarUsedC / solarAvail * 100) : 0, solarAvail: r1(solarAvail)
+    };
+  }
+
+  /* ---------------- site assessment model ---------------- */
+  const SITE_TYPES = [
+    { k: 'Residential Colony', i: 'home' }, { k: 'Apartment Community', i: 'apartment' }, { k: 'Office', i: 'briefcase' }, { k: 'Mall', i: 'bag' },
+    { k: 'Commercial Building', i: 'commercial' }, { k: 'Campus', i: 'campus' }, { k: 'Hotel', i: 'hotel' }, { k: 'Mixed-Use Site', i: 'layers' }
+  ];
+  function assess(a) {
+    const window = 14;                                       // hours per operating day
+    const perEv = clamp(r1(a.energy / a.hours * 2), 3.7, 11); // kW per vehicle (2x the average need)
+    const chargers = Math.max(1, Math.ceil(a.evs * a.hours / window));
+    const budget = Math.max(0, a.grid * .9 - a.building + a.solar * .5);
+    const simult = Math.max(0, Math.min(chargers, Math.floor(budget / perEv)));
+    const capacity = r1(simult * perEv);
+    const stressRatio = (a.building + capacity - a.solar * .5) / a.grid;
+    const stress = stressRatio < .7 ? 'LOW' : stressRatio < .95 ? 'MODERATE' : 'HIGH';
+    const cover = capacity ? a.solar / capacity : 0;
+    const solarUtil = cover >= .6 ? 'HIGH' : cover >= .25 ? 'MEDIUM' : 'LOW';
+    const strategy = stress === 'HIGH' ? 'PEAK SHAVING WITH LOOK-AHEAD' : simult < chargers ? 'SMART LOAD BALANCING' : solarUtil === 'HIGH' ? 'SOLAR-FIRST SCHEDULING' : 'STANDARD SCHEDULING';
+    return { chargers, simult, capacity, perEv, stress, stressRatio, solarUtil, strategy, budget: r1(budget), cover };
+  }
+
+  return {
+    NOW, LIMIT, SITE, T, P, r1, r2, clamp,
+    snap, status, setScenario, getScenario,
+    SERIES, profile, sparkOf, dayStats, stats, FORECAST,
+    FLEET, by, history, fleetStats, sessionStats, sessionDetail, optHistory,
+    DECISIONS, OPT, ALLOC_TIMELINE, allocSeries, FACTOR_KEYS, FACTOR_LABEL, ACTIVITY,
+    simulate, SITE_TYPES, assess
+  };
+})();
+
+/* Grid Charge live API client and GC compatibility bridge. */
+const GridChargeAPI = (() => {
+  const API_BASE = (window.GRID_CHARGE_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, '');
+
+  async function request(path) {
+    let response;
+    try {
+      response = await fetch(`${API_BASE}${path}`, { headers: { Accept: 'application/json' } });
+    } catch (error) {
+      throw new Error(`Backend unavailable: ${error.message}`);
+    }
+    let body;
+    try { body = await response.json(); } catch (_) { body = null; }
+    if (!response.ok) {
+      const detail = body && body.detail ? body.detail : `HTTP ${response.status}`;
+      throw new Error(`${path}: ${detail}`);
+    }
+    return body;
+  }
+
+  return {
+    base: API_BASE,
+    health: () => request('/api/health'),
+    dashboard: () => request('/api/dashboard'),
+    evs: () => request('/api/evs'),
+    ev: id => request(`/api/evs/${encodeURIComponent(id)}`),
+    grid: () => request('/api/grid'),
+    gridLatest: () => request('/api/grid/latest'),
+    gridSummary: () => request('/api/grid/summary'),
+    forecast: () => request('/api/forecast'),
+    forecastSample: () => request('/api/forecast/sample'),
+    optimization: () => request('/api/optimization'),
+    optimizationDecisions: () => request('/api/optimization/decisions'),
+    optimizationLatestDecisions: () => request('/api/optimization/decisions/latest'),
+    optimizationEV: id => request(`/api/optimization/ev/${encodeURIComponent(id)}`)
+  };
+})();
+
+const GridChargeLive = (() => {
+  const num = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
+  const bool = value => value === true || value === 1 || String(value).toLowerCase() === 'true';
+  const iso = value => new Date(value);
+  const minutes = value => { const date = iso(value); return Number.isNaN(date.getTime()) ? 0 : date.getUTCHours() * 60 + date.getUTCMinutes(); };
+  const clock = value => { const date = iso(value); return Number.isNaN(date.getTime()) ? '—' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }); };
+  const escStatus = value => value === 'completed' ? 'Complete' : value === 'deadline_missed' ? 'Incomplete' : value === 'incomplete' ? 'Paused' : 'Queued';
+  const priority = score => score >= .75 ? 'High' : score >= .5 ? 'Medium' : 'Low';
+  const level = capacity => capacity < 50 ? 'HIGH' : capacity < 100 ? 'MEDIUM' : 'LOW';
+
+  function buildSeries(grid) {
+    return grid.slice().sort((a, b) => iso(a.timestamp) - iso(b.timestamp)).map(row => ({
+      t: clock(row.timestamp), timestamp: row.timestamp,
+      building: num(row.building_demand_kw), ev: num(row.optimized_ev_charging_kw),
+      solar: num(row.solar_generation_kw), grid: num(row.controlled_site_demand_kw),
+      unc: num(row.uncontrolled_site_demand_kw), evU: num(row.uncontrolled_requested_ev_power_kw),
+      limit: num(row.grid_limit_kw), headroom: num(row.remaining_grid_capacity_kw)
+    }));
+  }
+
+  function normalizeFleet(evs, decisions) {
+    const latest = new Map();
+    decisions.forEach(row => latest.set(row.ev_id, row));
+    return evs.map((row, index) => {
+      const decision = latest.get(row.ev_id) || {};
+      const status = escStatus(row.charging_status);
+      const arr = minutes(row.arrival_time), dep = minutes(row.departure_time);
+      return {
+        n: index + 1, id: row.ev_id, status, sessionStatus: bool(row.deadline_missed) ? 'Deadline Missed' : status === 'Complete' ? 'Completed' : status,
+        sessionId: `S-${1000 + index + 1}`, cap: num(row.battery_capacity_kwh), target: num(row.target_soc),
+        soc: num(row.current_soc), init: num(row.current_soc), arr, dep, max: num(row.max_charging_power_kw),
+        power: num(row.optimized_charging_power_kw), required: num(row.energy_required_kwh),
+        sessionReq: num(row.energy_required_kwh), delivered: num(row.energy_delivered_kwh),
+        completion: num(row.completion_percentage), missed: bool(row.deadline_missed), unmet: num(row.energy_unmet_kwh),
+        urgency: bool(row.deadline_missed) ? 'High' : num(row.completion_percentage) >= 100 ? 'Done' : 'Medium',
+        priority: decision.priority_score == null ? '—' : priority(num(decision.priority_score)),
+        dataSource: row.data_source || 'backend V5 artifact'
+      };
+    });
+  }
+
+  function normalizeForecast(rows) {
+    const labels = [['15M', 'NEXT 15 MINUTES'], ['1H', 'NEXT HOUR'], ['3H', 'NEXT 3 HOURS'], ['6H', 'NEXT 6 HOURS']];
+    const sorted = rows.slice().sort((a, b) => iso(a.timestamp) - iso(b.timestamp));
+    return labels.map((entry, index) => {
+      const row = sorted[Math.min(index, sorted.length - 1)] || {};
+      return { k: entry[0], h: entry[1], building: num(row.predicted_building_demand_kw), capacity: num(row.forecast_available_capacity_kw), level: level(num(row.forecast_available_capacity_kw)), timestamp: row.timestamp };
+    });
+  }
+
+  function normalizeDecisions(rows) {
+    return rows.slice().sort((a, b) => iso(a.timestamp) - iso(b.timestamp)).map((row, index) => {
+      const score = num(row.priority_score), congestion = num(row.forecast_congestion);
+      return {
+        i: index, t: clock(row.timestamp), timestamp: row.timestamp, ev: row.ev_id, soc: num(row.current_soc),
+        reqAvg: num(row.required_average_power_kw), slack: num(row.slack_hours), fbBuilding: num(row.forecasted_building_demand_kw),
+        fbCap: num(row.forecasted_available_ev_capacity_kw), comp: num(row.forecast_competing_ev_demand_kw),
+        congestion: congestion > 1 ? 'HIGH' : congestion > .45 ? 'MEDIUM' : 'LOW', feas: num(row.forecast_feasibility_ratio) <= 1 ? 'Feasible' : 'At risk',
+        urg: num(row.forecast_urgency_score), score, alloc: num(row.allocated_power_kw), reason: row.decision_reason || 'Recorded V5 decision',
+        factors: { soc: Math.min(1, num(row.current_soc) / 100), urgency: num(row.forecast_urgency_score), energy: Math.min(1, num(row.required_average_power_kw) / 11), slack: Math.max(0, Math.min(1, 1 / (1 + num(row.slack_hours)))), congestion: Math.min(1, congestion) }
+      };
+    });
+  }
+
+  function apply(payload) {
+    const grid = payload.grid.data || [], evs = payload.evs.data || [], forecast = payload.forecast.data || [];
+    const decisions = payload.decisions.data || [], summary = payload.optimization, series = buildSeries(grid);
+    const fleet = normalizeFleet(evs, decisions), normalizedDecisions = normalizeDecisions(decisions);
+    const allocationRows = normalizedDecisions.slice(-24);
+    const allocationIds = [...new Set(allocationRows.map(row => row.ev))].slice(0, 4);
+    const latest = grid[grid.length - 1] || {}, stats = {
+      gridE: Number((series.reduce((sum, row) => sum + row.grid, 0) * .25).toFixed(1)),
+      solarE: Number((series.reduce((sum, row) => sum + row.solar, 0) * .25).toFixed(1)),
+      bldE: Number((series.reduce((sum, row) => sum + row.building, 0) * .25).toFixed(1)),
+      evE: Number((series.reduce((sum, row) => sum + row.ev, 0) * .25).toFixed(1)),
+      solarUsed: Number((series.reduce((sum, row) => sum + row.solar, 0) * .25).toFixed(1)),
+      gridUsed: Number((series.reduce((sum, row) => sum + row.grid, 0) * .25).toFixed(1)),
+      renewShare: 0, solarUtil: 0, peakEV: num(summary.peak_ev_charging_kw), peakCtrl: num(summary.peak_controlled_site_demand_kw),
+      peakUnc: Math.max(...series.map(row => row.unc), 0), ctrlOverload: num(summary.max_controlled_overload_kw), uncOverload: Math.max(...series.map(row => row.unc - row.limit), 0),
+      safeIntervals: num(summary.grid_safe_intervals), totalIntervals: num(summary.total_intervals), safety: Math.round(num(summary.grid_safe_intervals) / Math.max(1, num(summary.total_intervals)) * 100)
+    };
+    const liveSnap = () => ({ building: num(latest.building_demand_kw), solar: num(latest.solar_generation_kw), ev: num(latest.optimized_ev_charging_kw), gridImport: num(latest.controlled_site_demand_kw), limit: num(latest.grid_limit_kw), violations: grid.filter(row => !row.grid_safe).length, headroom: num(latest.remaining_grid_capacity_kw), util: num(latest.grid_utilization_percent) });
+    Object.assign(GC, {
+      DATA_MODE: 'live', API_ERROR: '', LIMIT: num(latest.grid_limit_kw, 250),
+      SITE: { name: 'V5 Residential Simulation', kind: 'Synthetic residential site', limit: num(latest.grid_limit_kw, 250), transformer: 'V5 grid limit' },
+      NOW: minutes(latest.timestamp), FLEET: fleet, SERIES: series, FORECAST: normalizeForecast(forecast), stats,
+      OPT: { version: 'V5', strategy: 'LOOK-AHEAD', horizon: '6 HOURS', interval: '15 MINUTES', decisions: decisions.length, forecastDecisions: decisions.filter(row => bool(row.forecast_influenced_decision)).length, avgCompletion: num(summary.average_completion_percent), unmet: num(summary.unmet_energy_kwh), deadlineMisses: num(summary.deadline_misses), peakEV: num(summary.peak_ev_charging_kw), peakSite: num(summary.peak_controlled_site_demand_kw), safeIntervals: num(summary.grid_safe_intervals), totalIntervals: num(summary.total_intervals) },
+      DECISIONS: normalizedDecisions.slice(-48).map((row, index) => ({ ...row, i: index })),
+      ALLOC_TIMELINE: normalizedDecisions.slice(-4).map(row => ({ t: row.t, ev: row.ev, p: row.alloc })),
+      allocSeries: { t: allocationRows.map(row => row.t), ids: allocationIds, s: allocationIds.map(id => allocationRows.map(row => row.ev === id ? row.alloc : 0)) }
+    });
+    GC.snap = liveSnap;
+    GC.status = () => { const snap = liveSnap(); if (snap.violations || snap.util >= 90) return { key: 'attention', label: 'ATTENTION REQUIRED', cls: 'st-crit', tone: 'crit', msg: 'Grid limit reached — V5 is protecting the site' }; if (snap.util >= 70) return { key: 'constrained', label: 'GRID CONSTRAINED', cls: 'st-warn', tone: 'warn', msg: 'V5 is limiting EV allocations' }; return { key: 'safe', label: 'SYSTEM SAFE', cls: 'st-safe', tone: 'safe', msg: 'Operating within safe capacity' }; };
+    GC.fleetStats = () => { const counts = { Charging: 0, Complete: 0, Queued: 0, Paused: 0 }; fleet.forEach(row => { counts[row.status] = (counts[row.status] || 0) + 1; }); return { total: fleet.length, ...counts, avgSoc: Math.round(fleet.reduce((sum, row) => sum + row.soc, 0) / Math.max(1, fleet.length)), avgCompletion: Math.round(num(summary.average_completion_percent)), required: num(summary.required_energy_kwh), delivered: num(summary.delivered_energy_kwh), power: num(summary.peak_ev_charging_kw) }; };
+    GC.sessionStats = () => { const fs = GC.fleetStats(); return { connected: latest.connected_ev_count || 0, active: fs.Charging, completed: fs.Complete, queued: fs.Queued, paused: fs.Paused, missed: num(summary.deadline_misses), energy: num(summary.delivered_energy_kwh), avgDur: 0, avgPower: fs.power / Math.max(1, fs.Charging), avgCompletion: fs.avgCompletion }; };
+    GC.profile = range => { const counts = { '1H': 5, '6H': 25, '12H': 49, '24H': 97 }; return series.slice(-(counts[range] || 25)); };
+    GC.sparkOf = (key, count = 24) => series.slice(-count).map(row => num(row[key]));
+    GC.by = id => fleet.find(row => row.id === id);
+    GC.history = ev => { const rows = decisions.filter(row => row.ev_id === ev.id); return { t: rows.map(row => clock(row.timestamp)), p: rows.map(row => num(row.allocated_power_kw)), soc: rows.map(row => num(row.current_soc)) }; };
+    GC.optHistory = ev => decisions.filter(row => row.ev_id === ev.id).slice(-6).map(row => ({ t: clock(row.timestamp), p: num(row.allocated_power_kw), prio: num(row.priority_score), cond: `Forecast capacity ${num(row.forecasted_available_ev_capacity_kw)} kW`, reason: row.decision_reason || 'Recorded V5 decision' }));
+    GC.sessionDetail = ev => ({ solarShare: 0, gridShare: 1, solarE: 0, gridE: ev.delivered, remainingH: 0, eta: null, fin: ev.status === 'Complete' ? ev.dep : null, deadline: ev.missed ? 'Missed' : ev.status === 'Complete' ? 'Met' : 'On track', adjustments: 0 });
+    GC.DATA_PROVENANCE = payload.dashboard.provenance || {};
+    window.dispatchEvent(new CustomEvent('gridcharge:data-ready'));
+  }
+
+  async function load() {
+    const [dashboard, evs, grid, forecast, optimization, decisions] = await Promise.all([
+      GridChargeAPI.dashboard(), GridChargeAPI.evs(), GridChargeAPI.grid(), GridChargeAPI.forecast(), GridChargeAPI.optimization(), GridChargeAPI.optimizationDecisions()
+    ]);
+    apply({ dashboard, evs, grid, forecast, optimization, decisions });
+    return true;
+  }
+
+  return { load, apply };
+})();
+
+window.GridChargeAPI = GridChargeAPI;
+window.GridChargeLive = GridChargeLive;
+
+/* =====================================================================
+   Icons + hand-rolled SVG charts (theme-token colours, no library)
+   ===================================================================== */
+const ICONS = {
+  bolt: 'M13 2 4 14h7l-1 8 9-12h-7z',
+  command: 'M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z',
+  car: 'M4 17V12l2-5.2A2 2 0 0 1 7.9 5.5h8.2a2 2 0 0 1 1.9 1.3L20 12v5M2.5 17h19M7.5 17v2.5M16.5 17v2.5M4 12h16M7.5 14.5h.01M16.5 14.5h.01',
+  plug: 'M9 2v5M15 2v5M6 7h12v4a6 6 0 0 1-12 0zM12 17v5',
+  sliders: 'M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1M15 4v4M9 10v4M17 16v4',
+  grid: 'M12 2v20M7 22l5-14 5 14M8.5 11h7M9.5 16h5M5 6h14',
+  pin: 'M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
+  flask: 'M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9V3M7.5 15h9',
+  cog: 'M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1',
+  info: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 11v6M12 7.5h.01',
+  sun: 'M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4',
+  building: 'M4 21V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v17M15 9h4a1 1 0 0 1 1 1v11M2 21h20M8 7h3M8 11h3M8 15h3',
+  search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3',
+  arrow: 'M5 12h14M13 6l6 6-6 6',
+  check: 'M5 12.5 10 17.5 19 7',
+  x: 'M6 6l12 12M18 6 6 18',
+  menu: 'M4 6h16M4 12h16M4 18h16',
+  home: 'M3 11 12 3l9 8M5 10v10h14V10M10 20v-5h4v5',
+  apartment: 'M5 21V3h9v18M14 8h5v13M8 7h3M8 11h3M8 15h3M2 21h20',
+  briefcase: 'M3 8h18v12H3zM9 8V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3M3 13h18',
+  bag: 'M5 8h14l1 13H4zM9 8a3 3 0 0 1 6 0',
+  commercial: 'M3 21h18M5 21V8l7-4 7 4v13M9 12h2M13 12h2M9 16h2M13 16h2',
+  campus: 'M3 10 12 5l9 5-9 5zM7 12.5V17c0 1 2.2 2.5 5 2.5s5-1.5 5-2.5v-4.5',
+  hotel: 'M3 18V7M3 13h18v5M21 18v-5a3 3 0 0 0-3-3h-7v3',
+  layers: 'M12 3 3 8l9 5 9-5zM3 13l9 5 9-5',
+  brain: 'M9 4a3 3 0 0 0-3 3v.5A3 3 0 0 0 4 10.5a3 3 0 0 0 1.5 2.6A3 3 0 0 0 7 18a3 3 0 0 0 5 1V4.5A2.5 2.5 0 0 0 9 4zM15 4a3 3 0 0 1 3 3v.5a3 3 0 0 1 2 3 3 3 0 0 1-1.5 2.6A3 3 0 0 1 17 18a3 3 0 0 1-5 1',
+  target: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 12h.01',
+  gauge: 'M4 18a9 9 0 1 1 16 0M12 13l4-4M12 13h.01',
+  eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z'
+};
+const I = (n, s) => `<svg viewBox="0 0 24 24" width="${s || 18}" height="${s || 18}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICONS[n] || ''}"/></svg>`;
+
+const Charts = (() => {
+  let uid = 0;
+  const fmtN = v => (Math.round(v * 10) / 10).toString();
+  const nice = max => {
+    const raw = Math.max(max, 1e-6) / 4, p = Math.pow(10, Math.floor(Math.log10(raw)));
+    const c = [1, 2, 2.5, 5, 10].map(m => m * p).find(v => v >= raw);
+    return c * 4;
+  };
+
+  function line(el, cfgIn) {
+    if (el._ch) { el._ch.set(cfgIn); return el._ch; }
+    let cfg = cfgIn;
+    const id = 'ch' + (++uid), state = { hidden: new Set(), w: 0 };
+    el.classList.add('chart');
+    function draw() {
+      const W = Math.max(300, Math.floor(el.clientWidth) || 640), H = cfg.height || 260, m = { l: 46, r: 16, t: 24, b: 28 };
+      state.w = el.clientWidth;
+      const iw = W - m.l - m.r, ih = H - m.t - m.b, n = cfg.labels.length;
+      const vis = cfg.series.filter(s => !state.hidden.has(s.key));
+      const yMax = cfg.yMax || nice(Math.max(...(vis.length ? vis : cfg.series).flatMap(s => s.values)));
+      const x = i => m.l + (n < 2 ? 0 : i / (n - 1)) * iw, y = v => m.t + ih - (Math.min(v, yMax) / yMax) * ih;
+      let g = '', defs = '';
+      for (let k = 0; k <= 4; k++) {
+        const v = yMax / 4 * k, yy = y(v);
+        g += `<line x1="${m.l}" x2="${W - m.r}" y1="${yy}" y2="${yy}" stroke="rgba(60,48,130,${k ? .11 : .28})" ${k ? 'stroke-dasharray="3 5"' : ''}/><text x="${m.l - 9}" y="${yy + 4}" text-anchor="end">${fmtN(v)}</text>`;
+      }
+      const tk = Math.min(cfg.xTicks || 5, n - 1);
+      for (let k = 0; k <= tk; k++) {
+        const i = Math.round(k * (n - 1) / tk);
+        g += `<text x="${x(i)}" y="${H - 7}" text-anchor="${k === 0 ? 'start' : k === tk ? 'end' : 'middle'}">${cfg.labels[i]}</text>`;
+      }
+      if (cfg.unit) g += `<text x="${m.l - 9}" y="${m.t - 14}" text-anchor="end" style="font-weight:800">${cfg.unit}</text>`;
+      const path = (vals, step) => vals.map((v, i) => {
+        const px = x(i), py = y(v);
+        return i === 0 ? `M${px} ${py}` : step ? `H${px}V${py}` : `L${px} ${py}`;
+      }).join('');
+      // overload region: series above the limit line
+      if (cfg.overload && !state.hidden.has(cfg.overload.key)) {
+        const s = cfg.series.find(q => q.key === cfg.overload.key), yl = y(cfg.overload.value);
+        defs += `<clipPath id="${id}-o"><rect x="${m.l}" y="0" width="${iw}" height="${yl}"/></clipPath>`;
+        g += `<path d="${path(s.values)}L${x(n - 1)} ${y(0)}L${x(0)} ${y(0)}Z" fill="rgba(229,72,77,.22)" clip-path="url(#${id}-o)"/>`;
+      }
+      vis.forEach((s, k) => {
+        const p = path(s.values, s.step);
+        if (s.area) {
+          defs += `<linearGradient id="${id}-g${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.color}" stop-opacity=".42"/><stop offset="1" stop-color="${s.color}" stop-opacity="0"/></linearGradient>`;
+          g += `<path d="${p}L${x(n - 1)} ${y(0)}L${x(0)} ${y(0)}Z" fill="url(#${id}-g${k})"/>`;
+        }
+        g += `<path d="${p}" fill="none" stroke="${s.color}" stroke-width="${s.width || 2.2}" stroke-linejoin="round" stroke-linecap="round" ${s.dash ? `stroke-dasharray="${s.dash}"` : ''}/>`;
+      });
+      vis.forEach(s => { if (!s.noDot && !s.dash) { const li = s.values.length - 1; g += `<circle cx="${x(li)}" cy="${y(s.values[li])}" r="4.5" fill="${s.color}" stroke="#ffffff" stroke-width="2"/>`; } });
+      g += `<line id="${id}-v" x1="0" x2="0" y1="${m.t}" y2="${m.t + ih}" stroke="rgba(60,48,130,.45)" stroke-width="1" style="display:none"/>`;
+      vis.forEach((s, k) => { g += `<circle id="${id}-d${k}" r="4.5" fill="${s.color}" stroke="#ffffff" stroke-width="2" style="display:none"/>`; });
+      const legend = cfg.legend === false ? '' : `<div class="legend" style="margin-bottom:12px">${cfg.series.map(s => `<button type="button" data-k="${s.key}" class="${state.hidden.has(s.key) ? 'off' : ''}" aria-pressed="${!state.hidden.has(s.key)}"><i style="background:${s.color};${s.dash ? 'background:repeating-linear-gradient(90deg,' + s.color + ' 0 5px,transparent 5px 8px)' : ''}"></i>${s.label}</button>`).join('')}</div>`;
+      el.innerHTML = `${legend}<div style="position:relative"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${cfg.aria || 'chart'}"><defs>${defs}</defs>${g}<rect id="${id}-hit" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/></svg><div class="tip" id="${id}-tip"></div></div>`;
+      el.querySelectorAll('.legend button').forEach(b => b.onclick = () => { const k = b.dataset.k; state.hidden.has(k) ? state.hidden.delete(k) : state.hidden.add(k); draw(); });
+      const hit = el.querySelector('#' + id + '-hit'), tip = el.querySelector('#' + id + '-tip'), vl = el.querySelector('#' + id + '-v'), svg = el.querySelector('svg');
+      const move = e => {
+        const rect = svg.getBoundingClientRect(), px = (e.clientX - rect.left) * (W / rect.width);
+        const i = Math.max(0, Math.min(n - 1, Math.round((px - m.l) / iw * (n - 1))));
+        vl.setAttribute('x1', x(i)); vl.setAttribute('x2', x(i)); vl.style.display = '';
+        vis.forEach((s, k) => { const d = el.querySelector('#' + id + '-d' + k); d.setAttribute('cx', x(i)); d.setAttribute('cy', y(s.values[i])); d.style.display = ''; });
+        tip.innerHTML = `<div class="t">${cfg.labels[i]}</div>` + vis.map(s => `<div class="r"><span><i style="background:${s.color}"></i>${s.label}</span><b>${fmtN(s.values[i])} ${cfg.unit || ''}</b></div>`).join('');
+        const left = x(i) * (rect.width / W), flip = left > rect.width - 190;
+        tip.style.left = (flip ? left - 178 : left + 14) + 'px'; tip.style.top = '6px'; tip.style.opacity = 1;
+      };
+      const leave = () => { tip.style.opacity = 0; vl.style.display = 'none'; vis.forEach((s, k) => el.querySelector('#' + id + '-d' + k).style.display = 'none'); };
+      hit.addEventListener('pointermove', move); hit.addEventListener('pointerdown', move); hit.addEventListener('pointerleave', leave);
+    }
+    draw();
+    if (window.ResizeObserver) {
+      const ro = new ResizeObserver(() => { if (!el.isConnected) { ro.disconnect(); return; } if (Math.abs(el.clientWidth - state.w) > 4) draw(); });
+      ro.observe(el);
+    }
+    el._ch = { redraw: draw, set: c => { cfg = c; draw(); } };
+    return el._ch;
+  }
+
+  function spark(vals, o = {}) {
+    const w = o.w || 120, h = o.h || 38, c = o.color || '#d5ccf7', pad = 4;
+    const mn = Math.min(...vals), mx = Math.max(...vals), rg = mx - mn || 1;
+    const pts = vals.map((v, i) => [pad + i / (vals.length - 1) * (w - pad * 2), h - pad - (v - mn) / rg * (h - pad * 2)]);
+    const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('');
+    const gid = 'sp' + (++uid), l = pts[pts.length - 1];
+    return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity=".4"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient></defs><path d="${d}L${l[0]} ${h}L${pad} ${h}Z" fill="url(#${gid})"/><path d="${d}" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${l[0]}" cy="${l[1]}" r="3.4" fill="${c}" stroke="#ffffff" stroke-width="1.6"/></svg>`;
+  }
+
+  function ring(pct, o = {}) {
+    const s = o.size || 84, sw = o.stroke || 9, r = (s - sw) / 2, c = 2 * Math.PI * r, col = o.color || '#d5ccf7';
+    return `<svg viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" role="img" aria-label="${o.aria || pct + '%'}"><circle cx="${s / 2}" cy="${s / 2}" r="${r}" fill="none" stroke="rgba(118,96,212,.15)" stroke-width="${sw}"/><circle cx="${s / 2}" cy="${s / 2}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c * Math.min(100, pct) / 100} ${c}" transform="rotate(-90 ${s / 2} ${s / 2})"/><text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" style="font-family:var(--f-body);font-weight:800;font-size:${s * .24}px;fill:var(--cream)">${o.label != null ? o.label : Math.round(pct) + '%'}</text></svg>`;
+  }
+
+  return { line, spark, ring };
+})();
+
+/* Landing hero illustration — redrawn from the reference: wind turbines, solar homes,
+   charger + EV, fireflies and a grainy violet dusk. Generated so it stays crisp at any size. */
+const BRAND_MARK = `<svg class="brand-mark" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="13" fill="none" stroke="currentColor" stroke-width="3.4" stroke-dasharray="64 18" stroke-linecap="round" transform="rotate(-72 17 17)"/><path d="M18.6 7.5 11 18.6h5.2L15.2 26.5 23 15.3h-5.2z" fill="#f5b041"/></svg>`;
+
+function heroArt() {
+  const turbine = (x, y, s, cls, col) => `<g class="turb ${cls}" transform="translate(${x} ${y}) scale(${s})">
+    <path d="M-4.4 300 L4.4 300 L1.7 0 L-1.7 0Z" fill="${col}"/>
+    <g class="blades">${[0, 120, 240].map(a => `<path transform="rotate(${a})" d="M0 -3 C-7 -20 -5 -52 0 -94 C5 -52 7 -20 0 -3Z" fill="${col}"/>`).join('')}</g>
+    <circle r="5.5" fill="${col}"/></g>`;
+  const tree = cs => cs.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r + 8}" fill="#e2a72c"/>`).join('') + cs.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#70401d"/>`).join('') + cs.map(([x, y, r]) => `<circle cx="${x - r * .28}" cy="${y - r * .3}" r="${r * .55}" fill="#8a5222" opacity=".55"/>`).join('');
+  const house = (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s})">
+    <rect x="158" y="-2" width="30" height="58" fill="#c9581c"/><rect x="154" y="-8" width="38" height="12" fill="#e98a2e"/>
+    <rect x="0" y="100" width="230" height="150" fill="#f2b96e"/>
+    <polygon points="0,102 115,10 230,102" fill="#f2b96e"/>
+    <rect x="0" y="100" width="230" height="150" fill="url(#wallShade)"/>
+    <polyline points="-14,110 115,-6 244,110" fill="none" stroke="#d9682a" stroke-width="28" stroke-linejoin="round" stroke-linecap="round"/>
+    <polyline points="-14,122 115,6 244,122" fill="none" stroke="#f0a83a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" opacity=".9"/>
+    <g transform="translate(9 88) rotate(-41.5)"><rect x="0" y="-12" width="104" height="24" rx="2" fill="#27216d" stroke="#9a96ec" stroke-width="1.6"/>
+      ${[17, 34, 51, 68, 85].map(v => `<line x1="${v}" x2="${v}" y1="-12" y2="12" stroke="#6764c8" stroke-width="1.2"/>`).join('')}<line x1="0" x2="104" y1="0" y2="0" stroke="#6764c8" stroke-width="1.2"/></g>
+    <rect x="118" y="126" width="84" height="70" rx="3" fill="#e0752b"/>
+    ${[0, 1, 2].map(c => [0, 1].map(rw => `<rect x="${123 + c * 25.5}" y="${131 + rw * 32}" width="22" height="28" fill="#b9b3ee"/>`).join('')).join('')}
+    <rect x="34" y="150" width="46" height="100" rx="3" fill="#dc6427"/><circle cx="72" cy="202" r="3" fill="#f5c860"/>
+  </g>`;
+  const leaf = (x, y, h, rot, c) => `<path transform="translate(${x} ${y}) rotate(${rot})" d="M0 0 C-${h * .32} -${h * .4} -${h * .18} -${h * .8} 0 -${h} C${h * .18} -${h * .8} ${h * .32} -${h * .4} 0 0Z" fill="${c}"/>`;
+  const ff = [[212, 615, 0], [345, 640, 1.2], [648, 610, 2.1], [880, 606, 0.6], [952, 630, 1.8], [420, 585, 2.6], [120, 600, 3], [1090, 622, 1.4], [760, 640, 2.3], [560, 648, 0.3]]
+    .map(([x, y, d]) => `<circle class="ff" cx="${x}" cy="${y}" r="3.2" fill="#ffe7a0" style="animation-delay:${d}s"/><circle cx="${x}" cy="${y}" r="9" fill="#ffe7a0" opacity=".12"/>`).join('');
+  const spokes = [0, 72, 144, 216, 288].map(a => `<rect x="-3" y="-30" width="6" height="30" rx="2" fill="#2a2660" transform="rotate(${a})"/>`).join('');
+  const wheel = (cx, cy) => `<g transform="translate(${cx} ${cy})"><circle r="53" fill="#231b58"/><circle r="45" fill="#15122f"/><circle r="32" fill="#c3c2d6"/><circle r="32" fill="url(#rim)"/>${spokes}<circle r="8" fill="#f1f0ff"/></g>`;
+
+  return `<svg viewBox="0 0 1200 680" preserveAspectRatio="xMidYMax slice" role="img" aria-label="Illustration: wind turbines, solar-roofed homes and an electric car charging at dusk">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8e79d2"/><stop offset=".45" stop-color="#7a66c6"/><stop offset=".72" stop-color="#6553b4"/><stop offset="1" stop-color="#3f2f8c"/></linearGradient>
+    <radialGradient id="sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#efe6ff" stop-opacity=".55"/><stop offset="1" stop-color="#efe6ff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6553b6"/><stop offset="1" stop-color="#4a3a9a"/></linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2b80"/><stop offset="1" stop-color="#241a5a"/></linearGradient>
+    <linearGradient id="car" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8b8f6"/><stop offset="1" stop-color="#8f8fe0"/></linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".55"/><stop offset="1" stop-color="#6d6a92" stop-opacity=".5"/></linearGradient>
+    <linearGradient id="wallShade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c46a25" stop-opacity=".0"/><stop offset="1" stop-color="#c46a25" stop-opacity=".35"/></linearGradient>
+    <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 -.32"/></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+  <rect width="1200" height="680" fill="url(#sky)"/>
+  <circle cx="150" cy="70" r="150" fill="url(#sun)"/>
+  <path d="M0 348 L96 280 L170 322 L285 214 L392 318 L472 268 L582 344 L690 300 L760 352 L760 440 L0 440Z" fill="#b1a4e6" opacity=".5"/>
+  <path d="M0 372 L140 318 L250 356 L372 292 L470 360 L610 322 L740 372 L740 440 L0 440Z" fill="#9887d6" opacity=".55"/>
+  ${turbine(84, 178, .95, 't1', '#33296f')}${turbine(196, 232, .74, 't2', '#42367f')}${turbine(342, 168, 1.02, 't3', '#2c2367')}${turbine(432, 248, .7, 't4', '#42367f')}
+  ${tree([[798, 128, 56], [850, 84, 52], [764, 176, 42], [838, 176, 58], [886, 146, 46]])}
+  ${tree([[1000, 116, 60], [1052, 74, 54], [1104, 122, 58], [1030, 168, 52], [1088, 172, 44]])}
+  ${tree([[1172, 150, 48], [1150, 200, 44], [1190, 96, 40]])}
+  ${house(686, 214, 1)}${house(922, 168, 1.12)}
+  <path d="M0 468 C160 428 380 418 640 428 S1000 420 1200 424 L1200 690 L0 690Z" fill="url(#hill)"/>
+  <path d="M0 592 C260 576 640 584 1200 572 L1200 690 L0 690Z" fill="url(#road)"/>
+  <ellipse cx="960" cy="612" rx="290" ry="12" fill="#1b1246" opacity=".55"/>
+  <!-- charger -->
+  <g transform="translate(646 384)">
+    <ellipse cx="31" cy="202" rx="60" ry="9" fill="#21174f" opacity=".6"/>
+    <rect x="-14" y="188" width="90" height="14" rx="4" fill="#7b5bc4"/>
+    <rect x="0" y="0" width="62" height="196" rx="12" fill="#5b3a93"/><rect x="0" y="0" width="62" height="42" rx="12" fill="#3f2672"/>
+    <rect x="11" y="58" width="40" height="70" rx="8" fill="#241650"/><path d="M35 66 21 95h9l-4 24 16-30H32z" fill="#cdb9ff"/>
+    <rect x="10" y="142" width="42" height="6" rx="3" fill="#7d5dbb"/><rect x="10" y="154" width="26" height="6" rx="3" fill="#7d5dbb" opacity=".6"/>
+  </g>
+  <path d="M708 410 C770 402 722 505 746 546" fill="none" stroke="#9b5db3" stroke-width="6.5" stroke-linecap="round"/>
+  <!-- EV -->
+  <g transform="translate(725 456)">
+    <path d="M0 102 C0 78 24 66 64 58 L120 24 C154 6 236 2 286 10 L340 48 C384 54 424 66 452 88 L470 98 L470 122 L0 122Z" fill="url(#car)" stroke="#dfe2ff" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M112 50 L150 22 Q172 12 218 12 L221 50Z" fill="#e3e6ff" opacity=".55"/><path d="M231 12 Q272 12 296 22 L332 50 L231 50Z" fill="#e3e6ff" opacity=".55"/>
+    <path d="M225 50 L225 108 M212 66 h16" stroke="#dfe2ff" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".9"/>
+    <path d="M26 92 C60 80 110 80 150 84" stroke="#e8eaff" stroke-width="2.4" fill="none" opacity=".7"/>
+    <path d="M330 62 C372 66 410 76 440 94" stroke="#e8eaff" stroke-width="2.4" fill="none" opacity=".6"/>
+    ${wheel(100, 118)}${wheel(382, 118)}
+  </g>
+  <!-- foreground -->
+  ${leaf(48, 700, 130, -18, '#2b2775')}${leaf(80, 700, 168, 4, '#3a3488')}${leaf(112, 700, 116, 24, '#2b2775')}${leaf(20, 700, 96, -38, '#4a43a0')}
+  ${leaf(1150, 700, 120, -10, '#2b2775')}${leaf(1180, 700, 96, 18, '#3a3488')}
+  <path d="M0 640 C90 622 150 640 220 650 L220 700 L0 700Z" fill="#2c2273" opacity=".7"/>
+  <ellipse cx="18" cy="662" rx="46" ry="26" fill="#7b6c99" opacity=".8"/><ellipse cx="1176" cy="670" rx="58" ry="30" fill="#5a3a7a" opacity=".85"/>
+  ${ff}
+  <rect width="1200" height="680" filter="url(#grain)" opacity=".38" style="mix-blend-mode:soft-light"/>
+  </svg>`;
+}
+
+/* =====================================================================
+   GRID CHARGE — application pages
+   Each page: { title, sub, html(), mount() }
+   ===================================================================== */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const { T, P, r1 } = GC;
+const f1 = v => (Math.round(v * 10) / 10).toFixed(1);
+const fmtInt = v => Math.round(v).toLocaleString('en-US');
+const dur = m => { const h = Math.floor(m / 60), mm = Math.round(m % 60); return h ? `${h}h ${String(mm).padStart(2, '0')}m` : `${mm}m`; };
+const TAG = 'Every vehicle. Every kilowatt. Intelligently connected.';
+
+const COLORS = { grid: '#7660d4', building: '#3f8cf0', solar: '#f2a51c', limit: '#2b2260', ev: '#e0709a', unc: '#e5484d', mint: '#2fb37c' };
+const STATUS_CLS = { Charging: 'st-info', Complete: 'st-safe', Completed: 'st-safe', Queued: 'st-lav', Paused: 'st-warn', 'Deadline Missed': 'st-crit', Incomplete: 'st-crit', Met: 'st-safe', 'On track': 'st-safe', 'At risk': 'st-warn', Missed: 'st-crit', Pending: 'st-lav' };
+const chip = (t, cls, dot = true) => `<span class="chip ${cls || STATUS_CLS[t] || ''}">${dot ? '<i class="dot"></i>' : ''}${t}</span>`;
+const prio = p => p === '—' ? '<span class="tx3">—</span>' : chip(p, p === 'High' ? 'st-warn' : p === 'Medium' ? 'st-info' : 'st-lav', false);
+const lvl = l => chip(l, l === 'HIGH' ? 'st-crit' : l === 'MEDIUM' ? 'st-warn' : 'st-safe');
+const bar = (pct, cls = '') => `<div class="bar ${cls}"><i style="width:${Math.max(0, Math.min(100, pct))}%"></i></div>`;
+const cellbar = (pct, label) => `<div class="cellbar">${bar(pct)}<b>${label != null ? label : Math.round(pct) + '%'}</b></div>`;
+const tile = (k, v, cls = '', extra = '') => `<div class="tile ${cls}"><span class="k">${k}</span><span class="v">${v}</span>${extra}</div>`;
+const unit = (v, u) => `${v}<span class="u">${u}</span>`;
+const card = (title, body, o = {}) => `<section class="card ${o.cls || ''}" ${o.id ? `id="${o.id}"` : ''}>${title || o.right ? `<header class="card-h"><div><div class="card-t">${title || ''}</div>${o.sub ? `<div class="card-s">${o.sub}</div>` : ''}</div>${o.right || ''}</header>` : ''}${body}</section>`;
+const seg = (group, opts, cur) => `<div class="seg" role="group" aria-label="${group}">${opts.map(o => `<button type="button" data-act="seg" data-g="${group}" data-v="${o}" class="${o === cur ? 'on' : ''}" aria-pressed="${o === cur}">${o}</button>`).join('')}</div>`;
+const pager = (page, pages, group) => `<div class="pager">${page > 1 ? '' : ''}<button type="button" data-act="page" data-g="${group}" data-v="${page - 1}" ${page <= 1 ? 'disabled' : ''} aria-label="Previous page">‹</button>${Array.from({ length: pages }, (_, i) => `<button type="button" data-act="page" data-g="${group}" data-v="${i + 1}" class="${i + 1 === page ? 'on' : ''}">${i + 1}</button>`).join('')}<button type="button" data-act="page" data-g="${group}" data-v="${page + 1}" ${page >= pages ? 'disabled' : ''} aria-label="Next page">›</button></div>`;
+
+/* persistent UI state */
+const S = {
+  range: '6H', horizon: '15M',
+  fleet: { q: '', status: 'All', soc: 'any', target: 'any', urg: 'any', comp: 'any', pow: 'any', page: 1, open: null },
+  sess: { q: '', status: 'All', page: 1, sel: 'S-1024' },
+  opt: { sel: 0 },
+  site: { type: 'Office', grid: 250, building: 195, solar: 40, evs: 20, energy: 24, hours: 8, done: true, err: '' },
+  wi: { limit: 240, evs: 70, solar: 150, bld: 100, maxP: 7.2 }
+};
+
+const Pages = {};
+
+/* ============================ COMMAND CENTER ============================ */
+Pages.command = {
+  title: 'Command Center', sub: TAG,
+  html() {
+    const s = GC.snap(), fs = GC.fleetStats(), st = GC.status(), ds = GC.stats;
+    const demand = s.building + s.ev, share = Math.round(s.solar / demand * 100);
+    const solarUsed = 96.8, solarUtil = Math.round(solarUsed / s.solar * 100);
+    const pct = Math.round(fs.Charging / fs.total * 100);
+    const capCls = st.key === 'safe' ? '' : st.key === 'constrained' ? 'warn' : 'crit';
+    const fleet4 = GC.FLEET.slice(0, 4);
+    return `
+    <p class="lead-p">What is happening across the entire charging ecosystem — vehicles, building, solar and grid — right now, and what the controller is about to do next.</p>
+    <div class="grid">
+      <div class="c3 card kpi t-lav">
+        <div class="k">${I('car')}Active Charging</div>
+        <div class="v v-xl">${fs.Charging}<span class="u"> / ${fs.total}</span></div>
+        <div class="note">vehicles charging intelligently</div>
+        <div class="aside">${Charts.ring(pct, { size: 66, stroke: 8, color: COLORS.grid })}</div>
+        <div class="foot">${bar(pct)}</div>
+      </div>
+      <div class="c3 card kpi t-sky">
+        <div class="k">${I('bolt')}EV Charging Power</div>
+        <div class="v v-xl">${unit(f1(s.ev), 'kW')}</div>
+        <div class="note">Within allocation · Balanced load</div>
+        <div class="foot">${Charts.spark(GC.sparkOf('ev', 30), { w: 250, h: 40, color: COLORS.building })}</div>
+      </div>
+      <div class="c3 card kpi t-sun">
+        <div class="k">${I('sun')}Solar Generation</div>
+        <div class="v v-xl">${unit(f1(s.solar), 'kW')}</div>
+        <div class="note">${share}% renewable share of demand</div>
+        <div class="aside">${Charts.ring(share, { size: 66, stroke: 8, color: COLORS.solar })}</div>
+        <div class="foot">${bar(share, 'amber')}</div>
+      </div>
+      <div class="c3 card kpi t-mint">
+        <div class="k">${I('plug')}Energy Delivered</div>
+        <div class="v v-xl">${unit(f1(fs.delivered), 'kWh')}</div>
+        <div class="note">${fs.Complete} sessions complete today</div>
+        <div class="foot">${Charts.spark(GC.sparkOf('grid', 40).map((v, i) => v * .4 + i * 3), { w: 250, h: 40, color: COLORS.mint })}</div>
+      </div>
+
+      ${card('Energy Flow', `
+        <div class="flowbox" style="height:390px">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true">
+            <line class="flow" x1="50" y1="14" x2="50" y2="50" stroke="${COLORS.solar}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linecap="round"/>
+            <line class="flow" x1="14" y1="50" x2="50" y2="50" stroke="${COLORS.grid}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linecap="round"/>
+            <line class="flow" x1="86" y1="50" x2="50" y2="50" stroke="${COLORS.building}" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linecap="round" style="animation-direction:reverse"/>
+            <line class="flow" x1="50" y1="50" x2="50" y2="86" stroke="${COLORS.ev}" stroke-width="3.4" vector-effect="non-scaling-stroke" stroke-linecap="round"/>
+          </svg>
+          <div class="fnode solar" style="left:50%;top:11%"><span class="k">Solar Generation</span><span class="v">${unit(f1(s.solar), 'kW')}</span></div>
+          <div class="fnode" style="left:15%;top:50%"><span class="k">Grid Import</span><span class="v">${unit(f1(s.gridImport), 'kW')}</span></div>
+          <div class="fnode bld" style="left:85%;top:50%"><span class="k">Building Demand</span><span class="v">${unit(f1(s.building), 'kW')}</span></div>
+          <div class="fctrl" style="left:50%;top:50%"><span class="n">SMART CONTROLLER</span><span class="n2">LOOK-AHEAD V5</span><span class="s">${chip(st.key === 'safe' ? 'BALANCED' : st.key === 'constrained' ? 'LIMITING' : 'PROTECTING', st.cls)}</span><span class="ok">${s.violations ? '! ' + s.violations : '✓ 0'} GRID LIMIT VIOLATIONS</span></div>
+          <div class="fnode ev" style="left:50%;top:89%"><span class="k">EV Charging</span><span class="v">${unit(f1(s.ev), 'kW')}</span></div>
+        </div>`, { cls: 'c8', sub: 'Solar + grid feed the controller, which decides how much reaches the vehicles.' })}
+
+      ${card('Grid Status', `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+          <div><div class="v v-xl" style="color:${st.key === 'safe' ? 'var(--mint)' : st.key === 'constrained' ? 'var(--gold)' : 'var(--coral)'}">${st.key === 'safe' ? 'SAFE' : st.key === 'constrained' ? 'WATCH' : 'ALERT'}</div><div class="k" style="margin-top:8px">${s.util}% Grid utilization</div></div>
+          ${Charts.ring(s.util, { size: 76, stroke: 9, color: st.key === 'safe' ? COLORS.mint : st.key === 'constrained' ? '#f0a01c' : COLORS.unc })}
+        </div>
+        <div class="capbar"><div class="fill ${capCls}" style="width:${s.util}%"></div><span class="mk" style="left:${Math.min(94, Math.max(6, s.util))}%">${f1(s.gridImport)} kW</span></div>
+        <div class="capbar-l"><span>0 kW</span><span>${GC.LIMIT} kW</span></div>
+        <div class="stat-list" style="margin-top:12px">
+          <div class="stat"><span class="k">Current import</span><span class="v v-md">${unit(f1(s.gridImport), 'kW')}</span></div>
+          <div class="stat"><span class="k">Available headroom</span><span class="v v-md">${unit(f1(s.headroom), 'kW')}</span></div>
+          <div class="stat"><span class="k">Controlled / uncontrolled overload</span><span class="v v-md">${f1(ds.ctrlOverload)} <span class="tx3">/</span> <span style="color:var(--coral)">${f1(ds.uncOverload)}</span><span class="u">kW</span></span></div>
+          <div class="stat"><span class="k">Grid-safe intervals</span><span class="v v-md">${ds.safeIntervals} / ${ds.totalIntervals}</span></div>
+        </div>
+        <div style="margin-top:12px">${chip(st.msg, st.cls)}</div>`, { cls: 'c4 t-mint' })}
+
+      ${card('Energy Profile', `<div id="ep-chart"></div>`, { cls: 'c8', sub: 'Demand against grid capacity, streamed from the backend.', right: seg('range', ['1H', '6H', '12H', '24H'], S.range) })}
+
+      ${card('Forecast Monitor', `<div id="fc-body"></div>`, { cls: 'c4 t-sky', sub: 'Grid Charge looks ahead — it does not only react.', right: seg('horizon', GC.FORECAST.map(f => f.k), S.horizon) })}
+
+      ${card('Optimization Engine', `
+        <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between">
+          <div><div class="v v-xl">${fmtInt(GC.OPT.decisions)}</div><div class="k" style="margin-top:8px">Intelligent decisions recorded</div></div>
+          ${chip('Grid constraints ✓ all satisfied', 'st-safe', false)}
+        </div>
+        <div class="stat-list" style="margin-top:14px">
+          <div class="stat"><span class="k">Strategy</span><b>LOOK-AHEAD V5</b></div>
+          <div class="stat"><span class="k">Planning horizon</span><b>${GC.OPT.horizon}</b></div>
+          <div class="stat"><span class="k">Optimization interval</span><b>${GC.OPT.interval}</b></div>
+        </div>
+        <p class="tx2" style="margin:14px 0 18px;font-size:13.5px;line-height:1.6">Balancing departure targets with available solar, building demand, grid capacity, battery SOC, and future congestion.</p>
+        <a class="link" href="#/optimization">View decision log ${I('arrow')}</a>`, { cls: 'c6 t-lav' })}
+
+      ${card('Renewable Contribution', `
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center">
+          <div style="display:grid;gap:10px;justify-items:center">${Charts.ring(share, { size: 112, stroke: 12, color: COLORS.solar, aria: 'Renewable share' })}<span class="k">Renewable share</span></div>
+          <div class="stat-list">
+            <div class="stat"><span class="k">Solar available</span><span class="v v-md">${unit(f1(s.solar), 'kW')}</span></div>
+            <div class="stat"><span class="k">Solar used</span><span class="v v-md">${unit(f1(solarUsed), 'kW')}</span></div>
+            <div class="stat"><span class="k">Renewable share</span><span class="v v-md">${share}%</span></div>
+            <div class="stat"><span class="k">Solar utilization</span><span class="v v-md">${solarUtil}%</span></div>
+          </div>
+        </div>
+        <p class="tx2" style="margin-top:14px;font-size:13px">Every kilowatt of solar the controller soaks up is a kilowatt the grid does not have to supply.</p>`, { cls: 'c6' })}
+
+      ${card('Fleet at a Glance', `
+        <div class="tiles" style="margin-bottom:16px">
+          ${tile('Charging', fs.Charging, 'hl')}${tile('Complete', fs.Complete, 'ok')}${tile('Queued', fs.Queued)}${tile('Paused', fs.Paused, 'warn')}
+        </div>
+        <div class="tbl-wrap"><table><thead><tr><th>Vehicle</th><th>Status</th><th>Battery / Target</th><th>Charging power</th><th>Departure</th><th>Details</th></tr></thead><tbody>
+          ${fleet4.map(e => `<tr class="click" data-act="open-ev" data-id="${e.id}"><td class="mono"><b>${e.id}</b></td><td>${chip(e.status)}</td><td>${e.soc}% <span class="tx3">/</span> ${e.target}%</td><td>${f1(e.power)} kW</td><td class="mono">${T(e.dep)}</td><td><span class="link">View ${I('arrow')}</span></td></tr>`).join('')}
+        </tbody></table></div>
+        <div style="margin-top:16px"><a class="link" href="#/fleet">View full fleet ${I('arrow')}</a></div>`, { cls: 'c8' })}
+
+      ${card('System Activity', `<div class="tl">${GC.ACTIVITY.map(a => `<div class="tl-i ${a.tone}"><span class="t">${a.t}</span><span class="d"><i></i></span><p>${a.a}<em>${a.b}</em></p></div>`).join('')}</div>`, { cls: 'c4 t-peach' })}
+    </div>`;
+  },
+  mount() { Pages.command.drawProfile(); Pages.command.drawForecast(); },
+  drawProfile() {
+    const pts = GC.profile(S.range);
+    Charts.line($('#ep-chart'), {
+      labels: pts.map(p => p.t), unit: 'kW', height: 290, xTicks: 6, aria: 'Energy profile',
+      series: [
+        { key: 'grid', label: 'Grid Import', color: COLORS.grid, values: pts.map(p => p.grid), area: true },
+        { key: 'building', label: 'Building Demand', color: COLORS.building, values: pts.map(p => p.building) },
+        { key: 'solar', label: 'Solar Generation', color: COLORS.solar, values: pts.map(p => p.solar), area: true },
+        { key: 'limit', label: 'Grid Limit', color: COLORS.limit, values: pts.map(p => p.limit), dash: '6 6', width: 1.8 }
+      ]
+    });
+  },
+  drawForecast() {
+    const f = GC.FORECAST.find(x => x.k === S.horizon), n = f.level === 'LOW' ? 1 : f.level === 'MEDIUM' ? 2 : 3;
+    $('#fc-body').innerHTML = `
+      <div class="k" style="color:var(--amber)">${f.h}</div>
+      <div class="stat-list" style="margin-top:6px">
+        <div class="stat"><span class="k">Predicted building demand</span><span class="v v-lg">${unit(f1(f.building), 'kW')}</span></div>
+        <div class="stat"><span class="k">Available future capacity</span><span class="v v-lg">${unit(f1(f.capacity), 'kW')}</span></div>
+      </div>
+      <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center"><span class="k">Forecast congestion</span>${lvl(f.level)}</div>
+      <div class="cong" style="margin-top:10px">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' + n : ''}"></i>`).join('')}</div>
+      <div style="margin-top:18px">${Charts.spark(GC.FORECAST.map(x => x.capacity), { w: 300, h: 46, color: COLORS.mint })}<div class="capbar-l" style="margin-top:4px"><span>Available capacity by horizon</span><span>15M → 6H</span></div></div>`;
+  }
+};
+
+/* ============================ EV FLEET ============================ */
+function fleetFiltered() {
+  const f = S.fleet, q = f.q.trim().toLowerCase();
+  return GC.FLEET.filter(e => {
+    if (q && !(e.id.toLowerCase().includes(q) || e.status.toLowerCase().includes(q) || e.id.replace('EV-', '').replace(/^0+/, '') === q)) return false;
+    if (f.status !== 'All' && e.status !== f.status) return false;
+    if (f.soc === '<40' && !(e.soc < 40)) return false;
+    if (f.soc === '40-70' && !(e.soc >= 40 && e.soc <= 70)) return false;
+    if (f.soc === '>70' && !(e.soc > 70)) return false;
+    if (f.target !== 'any' && e.target !== +f.target) return false;
+    if (f.urg !== 'any' && e.urgency !== f.urg) return false;
+    if (f.comp === '<50' && !(e.completion < 50)) return false;
+    if (f.comp === '50-80' && !(e.completion >= 50 && e.completion <= 80)) return false;
+    if (f.comp === '>80' && !(e.completion > 80)) return false;
+    if (f.pow === '0' && e.power !== 0) return false;
+    if (f.pow === '<5' && !(e.power > 0 && e.power < 5)) return false;
+    if (f.pow === '5-6.5' && !(e.power >= 5 && e.power <= 6.5)) return false;
+    if (f.pow === '>6.5' && !(e.power > 6.5)) return false;
+    return true;
+  });
+}
+const opt = (v, l, cur) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${l}</option>`;
+Pages.fleet = {
+  title: 'EV Fleet', sub: TAG,
+  html() {
+    const fs = GC.fleetStats(), f = S.fleet;
+    return `
+    <p class="lead-p">Monitor battery status, charging power, energy requirements, and departure urgency across every connected vehicle.</p>
+    <div class="tiles">
+      ${tile('Total EVs', fs.total, 'hl')}${tile('Charging', fs.Charging)}${tile('Complete', fs.Complete, 'ok')}${tile('Queued', fs.Queued)}${tile('Paused', fs.Paused, 'warn')}
+    </div>
+    <div class="tiles">
+      ${tile('Average SOC', fs.avgSoc + '%')}${tile('Average completion', fs.avgCompletion + '%')}${tile('Required energy', unit(fmtInt(fs.required), 'kWh'))}${tile('Delivered energy', unit(fmtInt(fs.delivered), 'kWh'))}
+    </div>
+    ${card('', `
+      <div class="filters">
+        <div class="field"><label for="fq">Search EV ID</label><div class="search">${I('search')}<input id="fq" class="inp" type="search" placeholder="e.g. EV-023 or 23" value="${f.q}" data-bind="fleet.q" autocomplete="off"></div></div>
+        <div class="field"><label for="fst">Charging status</label><select id="fst" class="sel" data-bind="fleet.status">${['All', 'Charging', 'Complete', 'Queued', 'Paused'].map(v => opt(v, v === 'All' ? 'All statuses' : v, f.status)).join('')}</select></div>
+        <div class="field"><label for="fsoc">Current SOC</label><select id="fsoc" class="sel" data-bind="fleet.soc">${opt('any', 'Any SOC', f.soc)}${opt('<40', 'Below 40%', f.soc)}${opt('40-70', '40 – 70%', f.soc)}${opt('>70', 'Above 70%', f.soc)}</select></div>
+        <div class="field"><label for="ftg">Target SOC</label><select id="ftg" class="sel" data-bind="fleet.target">${opt('any', 'Any target', f.target)}${[80, 85, 90, 100].map(v => opt(v, v + '%', f.target)).join('')}</select></div>
+        <div class="field"><label for="fug">Departure urgency</label><select id="fug" class="sel" data-bind="fleet.urg">${opt('any', 'Any urgency', f.urg)}${['High', 'Medium', 'Low'].map(v => opt(v, v + (v === 'High' ? ' (< 2 h)' : v === 'Medium' ? ' (2 – 4 h)' : ' (> 4 h)'), f.urg)).join('')}</select></div>
+        <div class="field"><label for="fcp">Completion</label><select id="fcp" class="sel" data-bind="fleet.comp">${opt('any', 'Any completion', f.comp)}${opt('<50', 'Below 50%', f.comp)}${opt('50-80', '50 – 80%', f.comp)}${opt('>80', 'Above 80%', f.comp)}</select></div>
+        <div class="field"><label for="fpw">Charging power</label><select id="fpw" class="sel" data-bind="fleet.pow">${opt('any', 'Any power', f.pow)}${opt('0', 'Not charging (0 kW)', f.pow)}${opt('<5', 'Below 5 kW', f.pow)}${opt('5-6.5', '5 – 6.5 kW', f.pow)}${opt('>6.5', 'Above 6.5 kW', f.pow)}</select></div>
+      </div>
+      <div id="fleet-table" style="margin-top:18px"></div>`, { cls: 'plain' })}`;
+  },
+  mount() { Pages.fleet.table(); if (S.fleet.open) { openEV(S.fleet.open); S.fleet.open = null; } },
+  table() {
+    const f = S.fleet, list = fleetFiltered(), per = 12, pages = Math.max(1, Math.ceil(list.length / per));
+    f.page = Math.min(f.page, pages);
+    const rows = list.slice((f.page - 1) * per, f.page * per);
+    $('#fleet-table').innerHTML = `<div class="tbl-wrap"><table><thead><tr>
+      <th>EV ID</th><th>Status</th><th>Current SOC</th><th>Target SOC</th><th>Battery capacity</th><th>Energy required</th><th>Charging power</th><th>Maximum power</th><th>Arrival</th><th>Departure</th><th>Completion</th><th>Priority</th><th>Details</th></tr></thead><tbody>
+      ${rows.length ? rows.map(e => `<tr class="click" data-act="open-ev" data-id="${e.id}"><td class="mono"><b>${e.id}</b></td><td>${chip(e.status)}</td><td>${cellbar(e.soc)}</td><td>${e.target}%</td><td>${e.cap} kWh</td><td>${f1(e.required)} kWh</td><td>${e.power ? f1(e.power) + ' kW' : '<span class="tx3">0.0 kW</span>'}</td><td>${f1(e.max)} kW</td><td class="mono">${T(e.arr)}</td><td class="mono">${T(e.dep)}</td><td>${cellbar(e.completion)}</td><td>${prio(e.priority)}</td><td><span class="link">View ${I('arrow')}</span></td></tr>`).join('') : `<tr><td colspan="13" class="empty">No vehicles match these filters. Clear a filter to see the full fleet.</td></tr>`}
+      </tbody></table></div>
+      <div class="tbl-foot"><span>Showing ${list.length ? (f.page - 1) * per + 1 : 0}–${Math.min(list.length, f.page * per)} of ${list.length} vehicles</span>${pages > 1 ? pager(f.page, pages, 'fleet') : ''}</div>`;
+  }
+};
+
+function openEV(id) {
+  const e = GC.by(id), h = GC.history(e), oh = GC.optHistory(e);
+  const wrap = $('#drawer');
+  wrap.innerHTML = `<div class="drawer-bg" data-act="close-drawer"></div>
+  <aside class="drawer" role="dialog" aria-modal="true" aria-label="${e.id} details">
+    <div class="drawer-h"><div><div class="k">EV detail</div><h2>${e.id}</h2><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">${chip(e.status)}${prio(e.priority)}<span class="chip">Session ${e.sessionId}</span></div></div>
+      <button class="x-btn" type="button" data-act="close-drawer" aria-label="Close details">${I('x')}</button></div>
+    <div class="tiles">
+      ${tile('Current SOC', e.soc + '%', 'hl')}${tile('Target SOC', e.target + '%')}${tile('Battery capacity', unit(e.cap, 'kWh'))}${tile('Energy required', unit(f1(e.required), 'kWh'))}
+      ${tile('Allocated power', unit(f1(e.power), 'kW'))}${tile('Maximum power', unit(f1(e.max), 'kW'))}${tile('Departure', T(e.dep))}${tile('Completion', e.completion + '%')}
+    </div>
+    <div class="dsec"><span class="card-t">Charging history</span>${h.t.length ? '<div id="dr-p"></div>' : '<p class="tx2">Queued — waiting for the optimizer to allocate power.</p>'}</div>
+    <div class="dsec"><span class="card-t">SOC history</span>${h.t.length ? '<div id="dr-s"></div>' : '<p class="tx2">No SOC samples yet.</p>'}</div>
+    <div class="dsec"><span class="card-t">Optimization history</span>
+      ${oh.length ? `<div class="tbl-wrap"><table><thead><tr><th>Timestamp</th><th>Allocated power</th><th>Priority</th><th>Forecast conditions</th><th>Decision reason</th></tr></thead><tbody>${oh.map(r => `<tr><td class="mono">${r.t}</td><td>${f1(r.p)} kW</td><td>${r.prio.toFixed(2)}</td><td class="wrap">${r.cond}</td><td class="wrap">${r.reason}</td></tr>`).join('')}</tbody></table></div>` : '<p class="tx2">No decisions recorded for this vehicle yet.</p>'}
+    </div>
+  </aside>`;
+  wrap.classList.add('open'); document.body.style.overflow = 'hidden';
+  if (h.t.length) {
+    Charts.line($('#dr-p'), { labels: h.t, unit: 'kW', height: 200, legend: false, xTicks: 4, aria: 'Charging power history', yMax: 8, series: [{ key: 'p', label: 'Charging power', color: COLORS.ev, values: h.p, area: true, step: true }] });
+    Charts.line($('#dr-s'), { labels: h.t, unit: '%', height: 200, legend: false, xTicks: 4, aria: 'SOC history', yMax: 100, series: [{ key: 's', label: 'SOC', color: COLORS.mint, values: h.soc, area: true }] });
+  }
+  $('.x-btn', wrap).focus();
+}
+
+/* ============================ CHARGING SESSIONS ============================ */
+function sessFiltered() {
+  const f = S.sess, q = f.q.trim().toLowerCase();
+  return GC.FLEET.filter(e => (f.status === 'All' || e.sessionStatus === f.status) && (!q || e.id.toLowerCase().includes(q) || e.sessionId.toLowerCase().includes(q)));
+}
+Pages.sessions = {
+  title: 'Charging Sessions', sub: TAG,
+  html() {
+    const s = GC.sessionStats(), f = S.sess;
+    return `
+    <p class="lead-p">The EV Fleet page describes the state of vehicles. This page describes individual charging events — what happened during each session.</p>
+    <div class="tiles">
+      ${tile('Connected vehicles', s.connected, 'hl')}${tile('Active sessions', s.active)}${tile('Completed today', s.completed, 'ok', s.missed ? `<span class="tx2" style="font-size:12px">${s.missed} missed their deadline</span>` : '')}${tile('Queued', s.queued)}
+    </div>
+    <div class="tiles">
+      ${tile('Energy delivered', unit(f1(s.energy), 'kWh'))}${tile('Average session duration', dur(s.avgDur * 60))}${tile('Average charging power', unit(f1(s.avgPower), 'kW'))}${tile('Average completion', s.avgCompletion + '%')}
+    </div>
+    ${card('Session log', `
+      <div class="filters" style="grid-template-columns:minmax(220px,1fr) auto;align-items:end">
+        <div class="field"><label for="sq">Search session or EV</label><div class="search">${I('search')}<input id="sq" class="inp" type="search" placeholder="S-1024 or EV-024" value="${f.q}" data-bind="sess.q" autocomplete="off"></div></div>
+        <div style="overflow-x:auto;padding-bottom:2px">${seg('sstatus', ['All', 'Charging', 'Completed', 'Queued', 'Paused', 'Deadline Missed', 'Incomplete'], f.status)}</div>
+      </div>
+      <div id="sess-table" style="margin-top:18px"></div>`, { cls: 'plain' })}
+    <div id="sess-detail"></div>`;
+  },
+  mount() {
+    const list = sessFiltered(), i = list.findIndex(e => e.sessionId === S.sess.sel);
+    if (i >= 0) S.sess.page = Math.floor(i / 10) + 1;
+    Pages.sessions.table(); Pages.sessions.detail();
+  },
+  table() {
+    const f = S.sess, list = sessFiltered(), per = 10, pages = Math.max(1, Math.ceil(list.length / per));
+    f.page = Math.min(f.page, pages);
+    const rows = list.slice((f.page - 1) * per, f.page * per);
+    $('#sess-table').innerHTML = `<div class="tbl-wrap"><table><thead><tr><th>Session ID</th><th>EV ID</th><th>Arrival</th><th>Departure</th><th>Duration</th><th>Initial SOC</th><th>Target SOC</th><th>Energy required</th><th>Energy delivered</th><th>Current power</th><th>Status</th><th>Completion</th></tr></thead><tbody>
+      ${rows.length ? rows.map(e => `<tr class="click ${e.sessionId === f.sel ? 'sel' : ''}" data-act="sel-session" data-id="${e.sessionId}"><td class="mono"><b>${e.sessionId}</b></td><td class="mono">${e.id}</td><td class="mono">${T(e.arr)}</td><td class="mono">${T(e.dep)}</td><td>${dur(e.dep - e.arr)}</td><td>${Math.round(e.init)}%</td><td>${e.target}%</td><td>${f1(e.sessionReq)} kWh</td><td>${f1(e.delivered)} kWh</td><td>${e.power ? f1(e.power) + ' kW' : '<span class="tx3">—</span>'}</td><td>${chip(e.sessionStatus)}</td><td>${cellbar(e.completion)}</td></tr>`).join('') : `<tr><td colspan="12" class="empty">No sessions match. Try another status, or clear the search.</td></tr>`}
+      </tbody></table></div>
+      <div class="tbl-foot"><span>${list.length} sessions · select a row to inspect it</span>${pages > 1 ? pager(f.page, pages, 'sess') : ''}</div>`;
+  },
+  detail() {
+    const e = GC.FLEET.find(x => x.sessionId === S.sess.sel) || GC.FLEET[23], d = GC.sessionDetail(e), h = GC.history(e);
+    const started = e.arr, ok = { arr: true, con: e.status !== 'Queued', opt: e.status !== 'Queued', chg: e.status !== 'Queued', adj: e.status === 'Charging' || e.status === 'Complete' || e.status === 'Paused', end: e.status === 'Complete' };
+    const step = (n, k, sm, time, on) => `<div class="step ${on ? '' : 'pend'}"><span class="n">${on ? n : ''}</span><div><b>${k}</b><small>${sm}</small></div><time>${time}</time></div>`;
+    $('#sess-detail').innerHTML = card(`Session detail · ${e.id}`, `
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:-4px 0 18px">${chip(e.sessionStatus)}<span class="chip">${e.sessionId}</span>${chip('Deadline ' + d.deadline, STATUS_CLS[d.deadline])}</div>
+      <div class="tiles">
+        ${tile('Arrival', T(e.arr))}${tile('Departure', T(e.dep))}${tile('Initial SOC', Math.round(e.init) + '%')}${tile('Target SOC', e.target + '%')}${tile('Energy required', unit(f1(e.sessionReq), 'kWh'), 'hl')}${tile('Energy delivered', unit(f1(e.delivered), 'kWh'), 'ok')}
+      </div>
+      <div class="grid" style="margin-top:22px">
+        <div class="c4 keep card plain"><div class="card-t" style="margin-bottom:16px">Session timeline</div><div class="steps">
+          ${step(1, 'Arrived', 'Vehicle detected at the site', T(started), ok.arr)}
+          ${step(2, 'Connected', 'Plug handshake complete', T(started + 3), ok.con)}
+          ${step(3, 'Optimization', 'Priority scored by V5 look-ahead', T(started + 8), ok.opt)}
+          ${step(4, 'Charging', 'Power allocated within grid limit', T(started + 15), ok.chg)}
+          ${step(5, 'Power adjustments', ok.adj ? d.adjustments + ' re-allocations so far' : 'Waiting for allocation', ok.adj ? T(Math.min(GC.NOW, e.dep)) : '—', ok.adj)}
+          ${step(6, 'Completed / Departed', e.status === 'Complete' ? (e.missed ? 'Departed below target SOC' : 'Target SOC reached') : 'In progress', e.status === 'Complete' ? T(d.fin) : '—', ok.end)}
+        </div></div>
+        <div class="c8 keep card plain" style="display:grid;gap:18px">
+          <div><div class="card-t" style="margin-bottom:10px">Charging power vs time</div>${h.t.length ? '<div id="sd-p"></div>' : '<p class="tx2">Queued — no power delivered yet.</p>'}</div>
+          <div><div class="card-t" style="margin-bottom:10px">SOC vs time</div>${h.t.length ? '<div id="sd-s"></div>' : '<p class="tx2">No SOC samples yet.</p>'}</div>
+        </div>
+      </div>
+      <div class="grid" style="margin-top:18px">
+        <div class="c4 keep card plain"><div class="card-t" style="margin-bottom:14px">Energy delivered</div>
+          <div class="v v-lg">${unit(f1(e.delivered), 'kWh')} <span class="tx3" style="font-size:.6em;font-weight:600">of ${f1(e.sessionReq)}</span></div>
+          <div style="margin-top:12px">${bar(e.sessionReq ? e.delivered / e.sessionReq * 100 : 0, 'mint')}</div><div class="capbar-l" style="margin-top:6px"><span>0</span><span>${e.sessionReq ? Math.round(e.delivered / e.sessionReq * 100) : 0}% of need</span></div></div>
+        <div class="c4 keep card plain"><div class="card-t" style="margin-bottom:14px">Solar vs grid contribution</div>
+          <div style="display:flex;height:16px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.1)"><i style="width:${d.solarShare * 100}%;background:${COLORS.solar}"></i><i style="width:${d.gridShare * 100}%;background:${COLORS.grid}"></i></div>
+          <div class="stat-list" style="margin-top:10px"><div class="stat"><span class="k"><span style="color:${COLORS.solar}">●</span> Solar</span><b>${f1(d.solarE)} kWh · ${Math.round(d.solarShare * 100)}%</b></div><div class="stat"><span class="k"><span style="color:${COLORS.grid}">●</span> Grid</span><b>${f1(d.gridE)} kWh · ${Math.round(d.gridShare * 100)}%</b></div></div></div>
+        <div class="c4 keep card plain"><div class="card-t" style="margin-bottom:6px">Outlook</div><div class="stat-list">
+          <div class="stat"><span class="k">Time remaining</span><b>${e.status === 'Charging' ? dur(Math.max(0, e.dep - GC.NOW)) : e.status === 'Complete' ? '—' : e.status === 'Queued' ? dur(e.dep - GC.NOW) : dur(Math.max(0, e.dep - GC.NOW))}</b></div>
+          <div class="stat"><span class="k">Estimated completion</span><b>${e.status === 'Charging' ? T(d.eta) : e.status === 'Complete' ? T(d.fin) : '—'}</b></div>
+          <div class="stat"><span class="k">Deadline status</span>${chip(d.deadline, STATUS_CLS[d.deadline])}</div></div></div>
+      </div>`, { cls: '' });
+    if (h.t.length) {
+      Charts.line($('#sd-p'), { labels: h.t, unit: 'kW', height: 190, legend: false, xTicks: 4, yMax: 8, aria: 'Charging power vs time', series: [{ key: 'p', label: 'Charging power', color: COLORS.ev, values: h.p, area: true, step: true }] });
+      Charts.line($('#sd-s'), { labels: h.t, unit: '%', height: 190, legend: false, xTicks: 4, yMax: 100, aria: 'SOC vs time', series: [{ key: 's', label: 'SOC', color: COLORS.mint, values: h.soc, area: true }] });
+    }
+  }
+};
+
+/* ============================ OPTIMIZATION ============================ */
+Pages.optimization = {
+  title: 'Optimization Engine', sub: 'Forecast-aware charging decisions for a safe and balanced local grid.',
+  html() {
+    const o = GC.OPT;
+    return `
+    <p class="lead-p">This page exposes the intelligence behind Grid Charge. Every allocation is scored, recorded, and explained — nothing is a black box.</p>
+    <div class="tiles">
+      ${tile('Optimization version', o.version, 'hl')}${tile('Strategy', o.strategy)}${tile('Planning horizon', o.horizon)}${tile('Optimization interval', o.interval)}${tile('Grid constraint', '✓ SATISFIED', 'ok')}
+    </div>
+    <div class="tiles">
+      ${tile('Total decisions', fmtInt(o.decisions))}${tile('Forecast-influenced decisions', fmtInt(o.forecastDecisions))}${tile('Peak EV charging', unit(f1(o.peakEV), 'kW'))}${tile('Peak controlled site demand', unit(f1(o.peakSite), 'kW'))}${tile('Grid-safe intervals', `${o.safeIntervals} / ${o.totalIntervals}`, 'ok')}
+    </div>
+    <div class="tiles">
+      ${tile('Average completion', o.avgCompletion + '%')}${tile('Unmet energy', unit(o.unmet, 'kWh'), 'warn')}${tile('Deadline misses', o.deadlineMisses, 'warn')}
+    </div>
+    ${card('Optimization decision log', `<div id="dec-table"></div>`, { sub: 'Latest 15-minute optimization rounds. Select a row to see why that vehicle received that power.', cls: 'plain' })}
+    <div class="grid">
+      ${card('Why was this EV given this power?', `<div id="dec-why"></div>`, { cls: 'c7', sub: 'Explainable optimization' })}
+      ${card('Optimization timeline', `<div class="tl">${GC.ALLOC_TIMELINE.map(a => `<div class="tl-i ${a.p >= 6 ? 'amber' : 'blue'}"><span class="t">${a.t}</span><span class="d"><i></i></span><p><b class="mono">${a.ev}</b> → ${f1(a.p)} kW<em>allocation ${a.p >= 6 ? 'raised' : 'trimmed'} by the look-ahead controller</em></p></div>`).join('')}</div>
+        <div style="margin-top:8px"><div class="card-t" style="margin-bottom:8px">Dynamic charging allocation</div><div id="alloc-chart"></div></div>`, { cls: 'c5', sub: 'How charging allocations change over time.' })}
+    </div>`;
+  },
+  mount() { Pages.optimization.table(); Pages.optimization.why(); const a = GC.allocSeries; const cols = [COLORS.grid, COLORS.building, COLORS.solar, COLORS.mint];
+    Charts.line($('#alloc-chart'), { labels: a.t, unit: 'kW', height: 230, xTicks: 4, yMax: 8, aria: 'Allocation per EV over time', series: a.ids.map((id, k) => ({ key: id, label: id, color: cols[k], values: a.s[k], step: true, width: 2, noDot: true })) }); },
+  table() {
+    const rows = GC.DECISIONS.slice(0, 14);
+    $('#dec-table').innerHTML = `<div class="tbl-wrap" style="max-height:440px"><table><thead><tr><th>Timestamp</th><th>EV ID</th><th>SOC</th><th>Required avg power</th><th>Slack hours</th><th>Forecast building demand</th><th>Forecast available capacity</th><th>Competing EV demand</th><th>Forecast congestion</th><th>Forecast feasibility</th><th>Forecast urgency</th><th>Priority score</th><th>Allocated power</th><th>Decision reason</th></tr></thead><tbody>
+      ${rows.map(d => `<tr class="click ${d.i === S.opt.sel ? 'sel' : ''}" data-act="sel-dec" data-i="${d.i}"><td class="mono">${d.t}</td><td class="mono"><b>${d.ev}</b></td><td>${d.soc}%</td><td>${f1(d.reqAvg)} kW</td><td>${f1(d.slack)} h</td><td>${f1(d.fbBuilding)} kW</td><td>${f1(d.fbCap)} kW</td><td>${f1(d.comp)} kW</td><td>${lvl(d.congestion)}</td><td>${chip(d.feas, d.feas === 'Feasible' ? 'st-safe' : d.feas === 'Tight' ? 'st-warn' : 'st-crit', false)}</td><td>${d.urg.toFixed(2)}</td><td><b>${d.score.toFixed(2)}</b></td><td>${f1(d.alloc)} kW</td><td class="wrap">${d.reason}</td></tr>`).join('')}</tbody></table></div>`;
+  },
+  why() {
+    const d = GC.DECISIONS[S.opt.sel];
+    $('#dec-why').innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div><div class="v v-lg mono" style="font-family:var(--f-mono)">${d.ev}</div><div class="tx3" style="font-size:12px;margin-top:4px">Decision recorded at ${d.t}</div></div>
+        <div style="display:flex;gap:26px"><div><div class="k">Priority score</div><div class="v v-lg">${d.score.toFixed(2)}</div></div><div><div class="k">Allocated power</div><div class="v v-lg">${unit(f1(d.alloc), 'kW')}</div></div></div>
+      </div>
+      ${GC.FACTOR_KEYS.map(k => { const v = d.factors[k], on = Math.round(v * 10); return `<div class="factor"><span class="k">${GC.FACTOR_LABEL[k]}</span><span class="blocks" role="img" aria-label="${Math.round(v * 100)} percent">${Array.from({ length: 10 }, (_, i) => `<i class="${i < on ? 'on' : ''}"></i>`).join('')}</span><b>${v.toFixed(2)}</b></div>`; }).join('')}
+      <div class="k" style="margin:16px 0 8px">Decision explanation</div>
+      <div class="why">${d.reason}</div>
+      <p class="tx3" style="margin-top:10px;font-size:12.5px">Generated from the recorded decision reason for this optimization round.</p>`;
+  }
+};
+
+/* ============================ GRID & ENERGY ============================ */
+Pages.grid = {
+  title: 'Grid & Energy', sub: TAG,
+  html() {
+    const s = GC.snap(), ds = GC.stats, st = GC.status(), evU = GC.SERIES[GC.SERIES.length - 1].evU;
+    const dist = [['Grid', ds.gridE, COLORS.grid], ['Solar', ds.solarE, COLORS.solar], ['Building', ds.bldE, COLORS.building], ['EV charging', ds.evE, COLORS.ev]], mx = Math.max(...dist.map(d => d[1]));
+    const solarUtil = ds.solarUtil, share = ds.renewShare;
+    return `
+    <p class="lead-p">A detailed look at the energy ecosystem: what the site draws, what the sun supplies, and how Grid Charge keeps the difference under the grid limit.</p>
+    <div class="tiles">
+      ${tile('Grid limit', unit(GC.LIMIT, 'kW'), 'hl')}${tile('Building demand', unit(f1(s.building), 'kW'))}${tile('Solar generation', unit(f1(s.solar), 'kW'))}${tile('EV charging', unit(f1(s.ev), 'kW'))}${tile('Grid import', unit(f1(s.gridImport), 'kW'))}${tile('Available headroom', unit(f1(s.headroom), 'kW'), st.key === 'safe' ? 'ok' : 'warn')}
+    </div>
+    ${card('Grid safety', `
+      <div class="tiles">
+        ${tile('Controlled overload', unit(f1(ds.ctrlOverload), 'kW'), 'ok')}${tile('Uncontrolled overload', unit(f1(ds.uncOverload), 'kW'), 'bad')}${tile('Grid-safe intervals', `${ds.safeIntervals} / ${ds.totalIntervals}`)}${tile('Safety', ds.safety + '%', 'ok')}
+        <div class="tile hl" style="display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:10px"><span class="k">Primary status</span>${chip(st.key === 'safe' ? 'SAFE' : st.label, st.cls)}</div>
+      </div>`, { cls: 'plain' })}
+    ${card('Controlled vs uncontrolled charging', `
+      <div class="split">
+        <div class="eq"><div class="k" style="margin-bottom:4px">Without smart control</div>
+          <div class="row"><span>Building demand</span><span class="num">${f1(s.building)} kW</span></div><div class="op">+</div>
+          <div class="row"><span>Uncontrolled EV demand</span><span class="num">${f1(evU)} kW</span></div><div class="op">−</div>
+          <div class="row"><span>Solar</span><span class="num">${f1(s.solar)} kW</span></div><div class="op">=</div>
+          <div class="res bad">Potential grid overload <span style="font-family:var(--f-body);font-weight:600;font-size:.8em;display:block;margin-top:4px">${f1(s.building + evU - s.solar)} kW now · peaks at ${f1(ds.peakUnc)} kW, ${f1(ds.uncOverload)} kW over the ${GC.LIMIT} kW limit</span></div></div>
+        <div class="eq"><div class="k" style="margin-bottom:4px;color:var(--mint)">With Grid Charge</div>
+          <div class="row"><span>Building demand</span><span class="num">${f1(s.building)} kW</span></div><div class="op">+</div>
+          <div class="row"><span>Optimized EV charging</span><span class="num">${f1(s.ev)} kW</span></div><div class="op">−</div>
+          <div class="row"><span>Solar</span><span class="num">${f1(s.solar)} kW</span></div><div class="op">=</div>
+          <div class="res good">Grid-safe site demand <span style="font-family:var(--f-body);font-weight:600;font-size:.8em;display:block;margin-top:4px">${f1(s.gridImport)} kW now · peaks at ${f1(ds.peakCtrl)} kW, always ≤ ${GC.LIMIT} kW</span></div></div>
+      </div>
+      <div style="margin-top:24px"><div id="cu-chart"></div></div>`, { sub: 'The clearest view of what intelligent charging control changes — over the last 24 hours.', cls: '' })}
+    <div class="grid">
+      ${card('Energy source distribution', `<div class="dist">${dist.map(d => `<div class="row"><span class="k" style="color:var(--lav-200)">${d[0]}</span><div class="bar" style="height:14px"><i style="width:${d[1] / mx * 100}%;background:${d[2]}"></i></div><b class="num">${fmtInt(d[1])} kWh</b></div>`).join('')}</div>
+        <div class="stat-list" style="margin-top:18px"><div class="stat"><span class="k">Solar energy used</span><b>${fmtInt(ds.solarUsed)} kWh</b></div><div class="stat"><span class="k">Grid energy used</span><b>${fmtInt(ds.gridUsed)} kWh</b></div><div class="stat"><span class="k">Renewable contribution</span><b>${share}%</b></div></div>`, { cls: 'c6', sub: 'Last 24 hours' })}
+      ${card('Solar / renewable utilization', `
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center"><div style="display:flex;gap:14px;flex-wrap:wrap">${Charts.ring(solarUtil, { size: 104, stroke: 11, color: COLORS.solar, aria: 'Solar utilization' })}${Charts.ring(share, { size: 104, stroke: 11, color: COLORS.grid, aria: 'Renewable share' })}</div>
+        <div class="stat-list"><div class="stat"><span class="k">Solar available</span><b>${fmtInt(ds.solarE)} kWh</b></div><div class="stat"><span class="k">Solar used</span><b>${fmtInt(ds.solarUsed)} kWh</b></div><div class="stat"><span class="k">Solar utilization</span><b>${solarUtil}%</b></div><div class="stat"><span class="k">Renewable share</span><b>${share}%</b></div></div></div>
+        <p class="tx2" style="margin-top:16px;font-size:13px">Grid Charge does not only manage grid capacity — it shifts charging into the hours when the sun is producing.</p>`, { cls: 'c6', sub: 'Last 24 hours' })}
+    </div>`;
+  },
+  mount() {
+    const p = GC.profile('24H');
+    Charts.line($('#cu-chart'), {
+      labels: p.map(x => x.t), unit: 'kW', height: 300, xTicks: 6, aria: 'Controlled versus uncontrolled site demand', overload: { key: 'unc', value: GC.LIMIT },
+      series: [
+        { key: 'unc', label: 'Uncontrolled Site Demand', color: COLORS.unc, values: p.map(x => x.unc), width: 2 },
+        { key: 'grid', label: 'Controlled Site Demand', color: COLORS.mint, values: p.map(x => x.grid), area: true },
+        { key: 'limit', label: 'Grid Limit', color: COLORS.limit, values: p.map(x => x.limit), dash: '6 6', width: 1.8 }
+      ]
+    });
+  }
+};
+
+/* ============================ SITE ASSESSMENT ============================ */
+const siteInputs = [
+  ['grid', 'Grid capacity', 'kW', 'Grid Capacity', 1], ['building', 'Peak building demand', 'kW', 'Peak Building Demand', 0], ['solar', 'Solar capacity', 'kW', 'Solar Capacity', 0],
+  ['evs', 'EVs per day', 'EVs', 'EVs Per Day', 1], ['energy', 'Average energy per EV', 'kWh', 'Average Energy Per EV', 1], ['hours', 'Average parking duration', 'hours', 'Average Parking Duration', 1]
+];
+Pages.site = {
+  title: 'Site Assessment', sub: TAG,
+  html() {
+    const a = S.site;
+    return `
+    <p class="lead-p">Site Assessment is the infrastructure-planning layer. It answers one question: how much EV charging infrastructure should this location have?</p>
+    <div class="grid">
+      ${card('Site details', `
+        <form id="site-form" novalidate>
+          <div class="field" style="margin-bottom:18px"><span class="k" style="color:var(--lav-300)" id="site-type-l">Site type</span>
+            <div class="types" role="group" aria-labelledby="site-type-l">${GC.SITE_TYPES.map(t => `<button type="button" class="type ${a.type === t.k ? 'on' : ''}" data-act="type" data-v="${t.k}" aria-pressed="${a.type === t.k}">${I(t.i)}${t.k}</button>`).join('')}</div></div>
+          <div class="form-grid">${siteInputs.map(([k, l, u]) => `<div class="field"><label for="si-${k}">${l}</label><div class="inp-unit"><input id="si-${k}" class="inp num" type="number" inputmode="decimal" min="0" step="any" value="${a[k]}" data-bind="site.${k}"><span>${u}</span></div></div>`).join('')}</div>
+          <div id="site-err" role="alert" style="margin-top:14px;color:var(--coral);font-weight:700;min-height:20px">${a.err || ''}</div>
+          <div style="margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;align-items:center"><button class="btn btn-cream" type="submit">Assess site ${I('arrow')}</button><span class="tx3" style="font-size:12.5px">Prefilled with an example ${a.type.toLowerCase()} — change any value and reassess.</span></div>
+        </form>`, { cls: 'c5' })}
+      <div class="c7" id="site-result" style="display:flex;flex-direction:column;gap:18px;min-width:0"></div>
+    </div>`;
+  },
+  mount() { Pages.site.result(); $('#site-form').addEventListener('submit', e => { e.preventDefault(); Pages.site.submit(); }); },
+  submit() {
+    const a = S.site, need = ['grid', 'building', 'solar', 'evs', 'energy', 'hours'];
+    const bad = need.find(k => !(Number(a[k]) >= 0) || a[k] === '' || (['grid', 'evs', 'energy', 'hours'].includes(k) && !(Number(a[k]) > 0)));
+    if (bad) { a.err = `Enter a ${['grid', 'evs', 'energy', 'hours'].includes(bad) ? 'number above 0' : 'number (0 or more)'} for “${siteInputs.find(x => x[0] === bad)[1]}”.`; $('#site-err').textContent = a.err; $('#si-' + bad).focus(); return; }
+    a.err = ''; $('#site-err').textContent = ''; a.done = true; Pages.site.result(true);
+  },
+  result(flash) {
+    const a = S.site, n = { grid: +a.grid, building: +a.building, solar: +a.solar, evs: +a.evs, energy: +a.energy, hours: +a.hours }, r = GC.assess(n);
+    const bPct = Math.min(100, n.building / n.grid * 100), cPct = Math.min(100 - bPct, r.capacity / n.grid * 100), rest = Math.max(0, 100 - bPct - cPct);
+    const stCls = r.stress === 'LOW' ? 'st-safe' : r.stress === 'MODERATE' ? 'st-warn' : 'st-crit', sCls = r.solarUtil === 'HIGH' ? 'st-safe' : r.solarUtil === 'MEDIUM' ? 'st-warn' : 'st-lav';
+    const paras = [];
+    if (r.budget <= 0) paras.push(`The peak building demand (${fmtInt(n.building)} kW) already uses almost all of the ${fmtInt(n.grid)} kW grid capacity. This site should upgrade its connection before adding chargers.`);
+    else paras.push(`The site has ${r.simult >= r.chargers ? 'sufficient' : 'enough'} grid capacity for the recommended ${f1(r.capacity)} kW of charging infrastructure when intelligent load balancing is used${r.simult < r.chargers ? `. Only ${r.simult} of the ${r.chargers} chargers can deliver full power at the same time` : ''}.`);
+    paras.push(n.solar > 0 ? `Solar availability (${fmtInt(n.solar)} kW) reduces net grid demand and improves renewable utilization — it can cover about ${Math.round(Math.min(1, r.cover) * 100)}% of the charging capacity at midday.` : 'With no solar on site, charging draws entirely from the grid; adding solar would reduce net demand and improve renewable utilization.');
+    paras.push(`Simultaneous charging should be managed to avoid excessive peak demand: at full use the site reaches ${Math.round(r.stressRatio * 100)}% of its grid capacity.`);
+    $('#site-result').innerHTML = `
+      ${card('Recommended charging infrastructure', `
+        <div class="reco">
+          ${tile('Recommended chargers', r.chargers, 'hl')}${tile('Maximum simultaneous charging', r.simult)}${tile('Recommended charging capacity', unit(f1(r.capacity), 'kW'))}
+          <div class="tile"><span class="k">Grid stress</span><span style="margin-top:10px;display:block">${chip(r.stress, stCls)}</span></div>
+          <div class="tile"><span class="k">Solar utilization</span><span style="margin-top:10px;display:block">${chip(r.solarUtil, sCls)}</span></div>
+          <div class="tile"><span class="k">Recommended strategy</span><span class="v v-md" style="font-size:1rem;margin-top:8px;display:block;line-height:1.25">${r.strategy}</span></div>
+        </div>
+        <div style="margin-top:22px"><div class="k" style="margin-bottom:10px">Peak-hour grid budget · ${fmtInt(n.grid)} kW connection</div>
+          <div style="display:flex;height:20px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.1)"><i style="width:${bPct}%;background:${COLORS.building}"></i><i style="width:${cPct}%;background:${COLORS.grid}"></i><i style="width:${rest}%;background:repeating-linear-gradient(135deg,rgba(47,179,124,.5) 0 6px,rgba(47,179,124,.2) 6px 12px)"></i></div>
+          <div class="chips" style="margin-top:12px;font-size:12.5px"><span><span style="color:${COLORS.building}">●</span> Building peak ${fmtInt(n.building)} kW</span><span><span style="color:${COLORS.grid}">●</span> EV capacity ${f1(r.capacity)} kW</span><span><span style="color:var(--mint)">●</span> Spare ${f1(Math.max(0, n.grid - n.building - r.capacity))} kW</span><span class="tx3">~${f1(r.perEv)} kW per vehicle</span></div></div>`, { cls: flash ? 'flash' : '' })}
+      ${card('Why this recommendation?', `<div style="display:grid;gap:12px">${paras.map(p => `<p class="why" style="font-size:.98rem">${p}</p>`).join('')}</div>`, {})}`;
+    if (flash) $('#site-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+};
+
+/* ============================ WHAT-IF SIMULATION ============================ */
+const WI_PRESETS = {
+  Baseline: { limit: 240, evs: 70, solar: 150, bld: 100, maxP: 7.2 },
+  'Double the fleet': { limit: 240, evs: 120, solar: 150, bld: 100, maxP: 7.2 },
+  'Heat-wave building load': { limit: 240, evs: 70, solar: 150, bld: 135, maxP: 7.2 },
+  'Grid derate': { limit: 180, evs: 70, solar: 150, bld: 100, maxP: 7.2 },
+  'Add solar': { limit: 240, evs: 70, solar: 300, bld: 100, maxP: 7.2 },
+  'Fast chargers': { limit: 240, evs: 70, solar: 150, bld: 100, maxP: 11 }
+};
+Pages.whatif = {
+  title: 'What-If Simulation', sub: TAG,
+  html() {
+    const w = S.wi, sl = (k, l, mn, mx, stp, u) => `<div class="slider"><div class="top"><label for="wi-${k}" class="k" style="color:var(--lav-300)">${l}</label><b id="wi-${k}-v">${w[k]} ${u}</b></div><input id="wi-${k}" type="range" min="${mn}" max="${mx}" step="${stp}" value="${w[k]}" data-bind="wi.${k}" style="--p:${(w[k] - mn) / (mx - mn) * 100}%"></div>`;
+    return `
+    <p class="lead-p">Change the site, run the day again. The simulator replays 24 hours of arrivals with and without Grid Charge, using the same 15-minute optimizer, so you can see what a larger fleet, a smaller grid connection or more solar would do.</p>
+    <div class="grid">
+      ${card('Scenario', `
+        <div class="presets" style="margin-bottom:22px">${Object.keys(WI_PRESETS).map(p => `<button type="button" data-act="preset" data-v="${p}">${p}</button>`).join('')}</div>
+        <div style="display:grid;gap:22px">
+          ${sl('limit', 'Grid limit', 120, 500, 10, 'kW')}${sl('evs', 'Vehicles per day', 10, 120, 5, 'EVs')}${sl('solar', 'Solar capacity', 0, 300, 10, 'kW')}${sl('bld', 'Building demand', 60, 150, 5, '%')}
+          <div class="slider"><div class="top"><span class="k" style="color:var(--lav-300)">Max charger power</span></div><div>${seg('maxP', ['3.7', '7.2', '11'], String(w.maxP))}<span class="tx3" style="margin-left:10px;font-size:12.5px">kW per vehicle</span></div></div>
+        </div>`, { cls: 'c4' })}
+      <div class="c8" style="display:flex;flex-direction:column;gap:18px;min-width:0" id="wi-out"></div>
+    </div>`;
+  },
+  mount() { Pages.whatif.run(); },
+  run() {
+    const w = S.wi, r = GC.simulate(w), avoided = r.overloadU;
+    const verdict = r.overloadC > 0 ? { l: 'ATTENTION REQUIRED', c: 'st-crit', m: 'Building demand alone exceeds the grid limit — charging cannot fix this.' } : r.unmet > 5 ? { l: 'GRID CONSTRAINED', c: 'st-warn', m: `Grid stays safe, but ${r.missed} vehicles leave short of target.` } : { l: 'SYSTEM SAFE', c: 'st-safe', m: 'Grid stays safe and every vehicle reaches its target.' };
+    $('#wi-out').innerHTML = `
+      ${card('Result', `
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:18px">${chip(verdict.l, verdict.c)}<span class="tx2">${verdict.m}</span></div>
+        <div class="tiles">
+          ${tile('Peak without control', unit(f1(r.peakU), 'kW'), r.peakU > w.limit ? 'bad' : '')}${tile('Peak with Grid Charge', unit(f1(r.peakC), 'kW'), r.peakC > w.limit ? 'bad' : 'ok')}${tile('Overload avoided', unit(f1(avoided), 'kW'), avoided > 0 ? 'hl' : '')}
+          ${tile('Grid-safe intervals', `${r.safeC} / ${r.steps}`, r.safeC === r.steps ? 'ok' : 'warn', `<span class="tx3" style="font-size:12px">${r.safeU} / ${r.steps} without control</span>`)}
+          ${tile('Unmet energy', unit(f1(r.unmet), 'kWh'), r.unmet > 5 ? 'warn' : 'ok', `<span class="tx3" style="font-size:12px">${r.missed} deadline misses</span>`)}${tile('Solar utilization', r.solarUtil + '%')}
+        </div>`, { cls: '' })}
+      ${card('Site demand over 24 hours', `<div id="wi-chart"></div>`, { sub: `Fleet demand ${fmtInt(r.demand)} kWh · ${w.evs} vehicles · ${w.limit} kW grid limit` })}`;
+    Charts.line($('#wi-chart'), {
+      labels: r.t, unit: 'kW', height: 300, xTicks: 6, aria: 'Simulated site demand', overload: { key: 'unc', value: w.limit },
+      series: [
+        { key: 'unc', label: 'Without Grid Charge', color: COLORS.unc, values: r.unc, width: 2, noDot: true },
+        { key: 'ctl', label: 'With Grid Charge', color: COLORS.mint, values: r.ctl, area: true, noDot: true },
+        { key: 'sol', label: 'Solar', color: COLORS.solar, values: r.sol, width: 1.6, noDot: true },
+        { key: 'lim', label: 'Grid Limit', color: COLORS.limit, values: r.limit, dash: '6 6', width: 1.8 }
+      ]
+    });
+  }
+};
+
+/* ============================ SYSTEM INFORMATION ============================ */
+Pages.system = {
+  title: 'System Information', sub: TAG,
+  html() {
+    const s = GC.snap(), st = GC.status(), sc = GC.getScenario();
+    const rows = [['Forecast model', 'Building & solar demand, 6 h ahead', 'safe', 'Healthy'], ['Optimization engine', 'Look-ahead V5 · 15-minute rounds', 'safe', 'Healthy'], ['Smart controller', 'Charger set-points acknowledged', 'safe', 'Healthy'], ['Telemetry feed', 'Meters, chargers, inverter · 5 s poll', 'safe', 'Live'], ['Explainability log', `${fmtInt(GC.OPT.decisions)} decisions stored`, 'safe', 'Healthy']];
+    return `
+    <p class="lead-p">How Grid Charge is wired, what it is configured to protect, and how the system status you see in the top bar is worked out.</p>
+    ${card('Architecture', `<div class="arch">
+      <div class="a">${I('brain', 22)}<b>ML Predicts</b><p>Forecasts building demand, solar output and arrivals for the next six hours.</p></div>
+      <div class="a">${I('sliders', 22)}<b>Optimization Decides</b><p>Scores every EV and allocates power within the grid limit each 15 minutes.</p></div>
+      <div class="a">${I('bolt', 22)}<b>Controller Acts</b><p>Sends set-points to chargers and re-checks the constraint continuously.</p></div>
+      <div class="a">${I('eye', 22)}<b>Dashboard Explains</b><p>Shows what was decided and why, in plain language.</p></div></div>`, { cls: 'plain' })}
+    <div class="grid">
+      ${card('Core safety constraint', `
+        <div class="why" style="text-align:center;font-weight:700">Building Demand + EV Charging − Solar Generation ≤ Grid Limit</div>
+        <div class="eq" style="margin-top:16px"><div class="row"><span>${f1(s.building)} + ${f1(s.ev)} − ${f1(s.solar)}</span><span class="num"><b>${f1(s.building + s.ev - s.solar)} kW</b></span></div>
+        <div class="res ${s.violations ? 'bad' : 'good'}">${f1(s.gridImport)} kW ≤ ${GC.LIMIT} kW · ${s.violations ? 'limit at risk' : 'constraint satisfied'}</div></div>`, { cls: 'c6', sub: 'Evaluated live against the latest telemetry.' })}
+      ${card('Configuration', `<div class="stat-list">
+        <div class="stat"><span class="k">Site</span><b>${GC.SITE.name}</b></div><div class="stat"><span class="k">Site type</span><b>${GC.SITE.kind}</b></div>
+        <div class="stat"><span class="k">Grid limit</span><b>${GC.LIMIT} kW</b></div><div class="stat"><span class="k">Transformer</span><b>${GC.SITE.transformer}</b></div>
+        <div class="stat"><span class="k">Strategy</span><b>Look-ahead V5</b></div><div class="stat"><span class="k">Planning horizon / interval</span><b>6 hours / 15 minutes</b></div>
+        <div class="stat"><span class="k">Data source</span><b>Simulated backend (demo)</b></div></div>`, { cls: 'c6' })}
+      ${card('System health', `<div class="stat-list">${rows.map(r => `<div class="stat"><div><b>${r[0]}</b><div class="tx3" style="font-size:12.5px">${r[1]}</div></div>${chip(r[3], 'st-' + r[2])}</div>`).join('')}</div>`, { cls: 'c6' })}
+      ${card('How status is decided', `
+        <div class="stat-list">
+          <div class="stat"><div>${chip('SYSTEM SAFE', 'st-safe')}</div><span class="tx2" style="font-size:13px">Grid utilization below 70%</span></div>
+          <div class="stat"><div>${chip('GRID CONSTRAINED', 'st-warn')}</div><span class="tx2" style="font-size:13px">70% – 90%</span></div>
+          <div class="stat"><div>${chip('ATTENTION REQUIRED', 'st-crit')}</div><span class="tx2" style="font-size:13px">Above 90%, or any limit violation</span></div></div>
+        <div style="margin-top:18px"><div class="k" style="margin-bottom:8px">Demo · simulate a grid condition</div>
+          <div class="seg" role="group" aria-label="Simulate grid condition">${[['normal', 'Normal'], ['constrained', 'Constrained'], ['attention', 'Attention']].map(([k, l]) => `<button type="button" data-act="scenario" data-v="${k}" class="${sc === k ? 'on' : ''}" aria-pressed="${sc === k}">${l}</button>`).join('')}</div>
+          <p class="tx3" style="font-size:12.5px;margin-top:10px">Currently ${st.label} at ${s.util}% utilization. Watch the top bar and Command Center react.</p></div>`, { cls: 'c6' })}
+    </div>`;
+  },
+  mount() {}
+};
+
+/* ============================ ABOUT ============================ */
+Pages.about = {
+  title: 'About', sub: TAG,
+  html() {
+    const factors = ['Building electricity demand', 'Local grid capacity', 'Transformer / grid limitations', 'EV battery State of Charge', 'EV arrival time', 'EV departure time', 'Target SOC', 'Energy required', 'Maximum charging power', 'Number of connected EVs', 'Competing EV charging demand', 'Solar / renewable availability', 'Future building demand', 'Forecasted grid congestion'];
+    return `
+    <div class="grid">
+      <section class="card cream c8"><div class="k">Product</div><h2 style="font-family:var(--f-display);font-weight:900;font-size:clamp(1.6rem,3vw,2.4rem);margin-top:8px;line-height:1.2">Grid Charge — Smart EV Charging &amp; Localized Grid Management</h2>
+        <p style="margin-top:14px;font-size:1.08rem;font-style:italic;font-family:var(--f-display)">${TAG}</p>
+        <p style="margin-top:14px;max-width:640px;line-height:1.7">Grid Charge intelligently coordinates EV charging with building demand, renewable energy, and local grid capacity to reduce peak stress, improve renewable utilization, and ensure safe and explainable charging decisions.</p></section>
+      ${card('In four words', `<div class="v v-lg" style="font-family:var(--f-display);line-height:1.5">Predict.<br>Optimize.<br>Balance.<br>Charge.</div>`, { cls: 'c4' })}
+      ${card('Operational intelligence', `<p class="v v-md" style="font-family:var(--f-display);font-weight:700;line-height:1.5">“How should we charge the connected EVs right now?”</p><p class="tx2" style="margin-top:12px;line-height:1.65">Layer 2 — real-time and simulated operations. Individual vehicles are coordinated against current and forecasted energy conditions on the Command Center, EV Fleet, Charging Sessions and Optimization pages.</p>`, { cls: 'c6' })}
+      ${card('Infrastructure planning', `<p class="v v-md" style="font-family:var(--f-display);font-weight:700;line-height:1.5">“How much EV charging infrastructure can this location safely support?”</p><p class="tx2" style="margin-top:12px;line-height:1.65">Layer 1 — site planning. Charger capacity, charger count, simultaneous charging capability, grid stress and renewable utilization, on the Site Assessment and What-If pages.</p>`, { cls: 'c6' })}
+      ${card('What Grid Charge weighs at every decision', `<div class="chips">${factors.map(f => `<span class="chip st-lav" style="text-transform:none;letter-spacing:.02em;font-size:12.5px;font-weight:700">${f}</span>`).join('')}</div>`, { cls: 'c12' })}
+      ${card('Website flow', `<div class="flow-map">${['Landing page', 'Get started', 'Command center'].map((n, i) => `<span class="n ${i === 2 ? 'hi' : ''}">${n}</span>${I('arrow')}`).join('')}<span class="n">EV Fleet</span><span class="tx3">·</span><span class="n">Charging Sessions</span><span class="tx3">·</span><span class="n">Optimization</span>${I('arrow')}<span class="n">Grid &amp; Energy</span>${I('arrow')}<span class="n">Site Assessment</span>${I('arrow')}<span class="n">What-If Simulation</span>${I('arrow')}<span class="n">System Information</span></div>`, { cls: 'c12 plain' })}
+    </div>`;
+  },
+  mount() {}
+};
+
+/* =====================================================================
+   GRID CHARGE — shell, router, events
+   ===================================================================== */
+const NAV = [
+  ['command', 'Command Center', 'command'], ['fleet', 'EV Fleet', 'car'], ['sessions', 'Charging Sessions', 'plug'],
+  ['optimization', 'Optimization', 'sliders'], ['grid', 'Grid & Energy', 'grid'], ['site', 'Site Assessment', 'pin'], ['whatif', 'What-If Simulation', 'flask']
+];
+const NAV2 = [['system', 'System Information', 'cog'], ['about', 'About', 'info']];
+let current = null;
+
+function buildShell() {
+  const link = ([k, l, ic]) => `<a href="#/${k}" data-page="${k}">${I(ic)}<span>${l}</span></a>`;
+  $('#app').innerHTML = `
+    <aside class="side" id="side" aria-label="Main navigation">
+      <a class="brand" href="#/" aria-label="Grid Charge home">${BRAND_MARK}<span class="brand-name">GRID CHARGE</span></a>
+      <div class="sub">Charging Intelligence</div>
+      <nav class="nav" aria-label="Application">${NAV.map(link).join('')}</nav>
+      <div class="nav-sep"></div>
+      <nav class="nav" aria-label="System">${NAV2.map(link).join('')}</nav>
+      <div class="side-fill"></div>
+      <div class="side-card" id="side-card"></div>
+    </aside>
+    <div class="main">
+      <header class="topbar">
+        <div class="tb-l"><button class="tb-menu" type="button" data-act="menu" aria-label="Open navigation">${I('menu', 20)}</button>
+          <div><h1 class="tb-title" id="tb-title"></h1><div class="tb-sub" id="tb-sub"></div></div></div>
+        <div class="tb-r" id="tb-r"></div>
+      </header>
+      <main class="content" id="content"></main>
+    </div>`;
+}
+
+function updateStatus() {
+  const st = GC.status(), s = GC.snap();
+  $('#tb-r').innerHTML = `<span class="tb-clock">${GC.SITE.name} · ${T(GC.NOW)}</span>
+    <span class="chip ${st.cls}" role="status" aria-live="polite"><i class="dot"></i>${st.label}</span>
+    <span class="chip st-lav">V5 look-ahead${current === 'command' ? ' optimization' : ''}</span>
+    <span class="chip ${GC.DATA_MODE === 'live' ? 'st-safe' : 'st-warn'}">${GC.DATA_MODE === 'live' ? 'LIVE API' : 'DEMO DATA'}</span>`;
+  $('#side-card').innerHTML = `<div class="row"><span class="l">Grid utilization</span><span class="v">${s.util}%</span></div><div class="mini-bar"><i style="width:${s.util}%"></i></div><div class="row" style="margin-top:10px"><span class="l">Headroom</span><span class="tx2" style="font-weight:700;font-size:12.5px">${f1(s.headroom)} kW</span></div>`;
+}
+
+function renderPage() {
+  const pg = Pages[current];
+  $('#tb-title').textContent = pg.title; $('#tb-sub').textContent = pg.sub;
+  $$('.nav a').forEach(a => { const on = a.dataset.page === current; a.classList.toggle('on', on); on ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'); });
+  $('#content').innerHTML = pg.html();
+  updateStatus();
+  pg.mount();
+}
+
+function route() {
+  const key = location.hash.replace(/^#\/?/, '').split('/')[0];
+  const wasApp = !$('#app').hidden;
+  closeDrawer(); document.body.classList.remove('nav-open');
+  if (Pages[key]) {
+    current = key;
+    if (!$('#app').innerHTML) buildShell();
+    $('#landing').hidden = true; $('#app').hidden = false;
+    document.title = pg(key).title + ' · Grid Charge';
+    renderPage(); window.scrollTo(0, 0);
+  } else {
+    $('#app').hidden = true; $('#landing').hidden = false; document.title = 'Grid Charge';
+    const target = key && document.getElementById(key);
+    if (target) target.scrollIntoView(); else if (wasApp || !key) window.scrollTo(0, 0);
+  }
+}
+const pg = k => Pages[k];
+
+function closeDrawer() { const d = $('#drawer'); if (d.classList.contains('open')) { d.classList.remove('open'); d.innerHTML = ''; document.body.style.overflow = ''; } }
+
+/* ---------- actions ---------- */
+function setSeg(el) { $$('button', el.closest('.seg')).forEach(b => { const on = b === el; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); }
+const Act = {
+  menu() { document.body.classList.toggle('nav-open'); },
+  seg(el) {
+    const g = el.dataset.g, v = el.dataset.v; setSeg(el);
+    if (g === 'range') { S.range = v; Pages.command.drawProfile(); }
+    if (g === 'horizon') { S.horizon = v; Pages.command.drawForecast(); }
+    if (g === 'sstatus') { S.sess.status = v; S.sess.page = 1; Pages.sessions.table(); }
+    if (g === 'maxP') { S.wi.maxP = +v; Pages.whatif.run(); }
+  },
+  page(el) { const g = el.dataset.g; S[g === 'fleet' ? 'fleet' : 'sess'].page = +el.dataset.v; Pages[g === 'fleet' ? 'fleet' : 'sessions'].table(); },
+  'open-ev'(el) { if (current === 'fleet') openEV(el.dataset.id); else { S.fleet.open = el.dataset.id; location.hash = '#/fleet'; } },
+  'close-drawer': closeDrawer,
+  'sel-session'(el) { S.sess.sel = el.dataset.id; Pages.sessions.table(); Pages.sessions.detail(); $('#sess-detail').scrollIntoView({ behavior: 'smooth', block: 'start' }); },
+  'sel-dec'(el) { S.opt.sel = +el.dataset.i; Pages.optimization.table(); Pages.optimization.why(); $('#dec-why').closest('.card').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); },
+  scenario(el) { GC.setScenario(el.dataset.v); renderPage(); },
+  type(el) { S.site.type = el.dataset.v; $$('.type').forEach(b => { const on = b === el; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); },
+  preset(el) { S.wi = { ...WI_PRESETS[el.dataset.v] }; renderPage(); }
+};
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  if (el.tagName === 'A') return;
+  if (el.classList.contains('drawer-bg') && e.target !== el) return;
+  Act[el.dataset.act] && Act[el.dataset.act](el, e);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeDrawer(); document.body.classList.remove('nav-open'); }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('tr.click')) { e.preventDefault(); e.target.click(); }
+});
+let wiRaf = 0;
+document.addEventListener('input', e => {
+  const el = e.target.closest('[data-bind]'); if (!el) return;
+  const [ns, k] = el.dataset.bind.split('.');
+  if (ns === 'fleet') { S.fleet[k] = el.value; S.fleet.page = 1; Pages.fleet.table(); }
+  else if (ns === 'sess') { S.sess.q = el.value; S.sess.page = 1; Pages.sessions.table(); }
+  else if (ns === 'site') { S.site[k] = el.value; }
+  else if (ns === 'wi') {
+    S.wi[k] = +el.value;
+    const u = { limit: 'kW', evs: 'EVs', solar: 'kW', bld: '%' }[k], mn = +el.min, mx = +el.max;
+    $('#wi-' + k + '-v').textContent = el.value + ' ' + u; el.style.setProperty('--p', (el.value - mn) / (mx - mn) * 100 + '%');
+    cancelAnimationFrame(wiRaf); wiRaf = requestAnimationFrame(() => Pages.whatif.run());
+  }
+});
+document.addEventListener('click', e => { if (e.target.closest('.nav a')) document.body.classList.remove('nav-open'); });
+// keyboard access for clickable table rows
+new MutationObserver(() => $$('tr.click:not([tabindex])').forEach(r => r.setAttribute('tabindex', '0'))).observe(document.body, { childList: true, subtree: true });
+
+/* ---------- boot ---------- */
+$('#hero-art').innerHTML = heroArt();
+const FEATS = [
+  ['command', 'Command Center', 'command', 'The whole charging ecosystem at a glance: energy flow, grid status, forecast and fleet.'],
+  ['fleet', 'EV Fleet', 'car', 'Battery, power, energy need and departure urgency for every connected vehicle.'],
+  ['sessions', 'Charging Sessions', 'plug', 'What happened during each charging event, from arrival to departure.'],
+  ['optimization', 'Optimization', 'sliders', 'Forecast-aware decisions with a plain-language reason for every kilowatt.'],
+  ['grid', 'Grid & Energy', 'grid', 'Controlled versus uncontrolled demand, solar use and grid safety in one view.'],
+  ['site', 'Site Assessment', 'pin', 'How many chargers can this location safely support? Get a sized recommendation.'],
+  ['whatif', 'What-If Simulation', 'flask', 'Resize the fleet, the grid or the solar array and replay the day.']
+];
+$('#feat-grid').innerHTML = FEATS.map(f => `<a class="feat" href="#/${f[0]}"><span class="fi">${I(f[2])}</span><h3>${f[1]}</h3><p>${f[3]}</p></a>`).join('');
+window.addEventListener('hashchange', route);
+route();
+
+/* Hydrate the existing GC contract from FastAPI without blocking the demo shell. */
+if (window.GridChargeLive) {
+  GridChargeLive.load().then(() => {
+    if (current && Pages[current]) renderPage();
+  }).catch(error => {
+    GC.DATA_MODE = 'demo';
+    GC.API_ERROR = error.message;
+    if (current && Pages[current]) updateStatus();
+    console.warn('Grid Charge backend unavailable; retaining demo data.', error);
+  });
+}
+
+</script>
+</body></html>

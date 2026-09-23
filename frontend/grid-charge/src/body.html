@@ -1,0 +1,59 @@
+<div id="landing">
+  <header class="hero" id="home">
+    <div class="hero-art" id="hero-art"></div>
+    <div class="hero-shade"></div>
+    <div class="hero-ring"></div>
+    <nav class="hero-nav" aria-label="Primary">
+      <a class="brand" href="#/" aria-label="Grid Charge home"><!--MARK--><span class="brand-name">GRID CHARGE</span></a>
+      <div class="hero-links">
+        <a href="#home" class="on">Home</a>
+        <a href="#platform">Platform</a>
+        <a href="#features">Features</a>
+      </div>
+      <div class="hero-status"><span class="chip pulse st-safe"><i class="dot"></i>System safe · V5 look-ahead</span></div>
+    </nav>
+    <div class="hero-body">
+      <h1>Smart EV Charging &amp; Localized Grid Management</h1>
+      <p class="tagline">Every vehicle. Every kilowatt. Intelligently connected.</p>
+      <p class="desc">Grid Charge coordinates EV charging, building demand, grid capacity, and renewable energy using forecast-aware intelligent optimization.</p>
+      <div class="cta-pill">
+        <span class="lead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Open the live platform</span></span>
+        <a class="btn" href="#/command">Get Started <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="verbs" aria-label="Predict. Optimize. Balance. Charge."><span>Predict</span><span>Optimize</span><span>Balance</span><span>Charge</span></div>
+    </div>
+  </header>
+
+  <section class="lsec" id="platform">
+    <div class="eyebrow">The platform</div>
+    <h2>Not a charger dashboard. An energy intelligence platform.</h2>
+    <p class="lead">Instead of letting every EV charge on its own and stack up a large peak, Grid Charge weighs building demand, grid capacity, battery SOC, departure times and solar availability — then decides how much power each vehicle gets.</p>
+    <div class="pipeline">
+      <div class="pipe"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 18a9 9 0 1 1 16 0M12 13l4-4"/></svg><div class="verb"><small>Step 1</small>ML Predicts</div><p>Forecasts building demand, solar output and grid congestion six hours ahead.</p></div>
+      <div class="pipe"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1M15 4v4M9 10v4M17 16v4"/></svg><div class="verb"><small>Step 2</small>Optimization Decides</div><p>Scores every vehicle by urgency, SOC and grid slack, then allocates power every 15 minutes.</p></div>
+      <div class="pipe"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><div class="verb"><small>Step 3</small>Controller Acts</div><p>Sends set-points to each charger and keeps the site inside its grid limit.</p></div>
+      <div class="pipe"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg><div class="verb"><small>Step 4</small>Dashboard Explains</div><p>Shows every decision and the reason behind it, in plain language.</p></div>
+    </div>
+    <div class="eqn">
+      <div><div class="k">Core safety constraint</div><div class="f">Building Demand + EV Charging − Solar Generation ≤ Grid Limit</div></div>
+      <div class="ok"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>Enforced every interval</div>
+    </div>
+  </section>
+
+  <section class="lsec alt" id="features">
+    <div class="eyebrow">Features</div>
+    <h2>Two layers: plan the site, then run it.</h2>
+    <p class="lead">Site planning answers how much charging a location can safely support. Real-time operations answer how to charge the connected vehicles right now.</p>
+    <div class="feat-grid" id="feat-grid"></div>
+    <div class="closer" style="margin-top:64px">
+      <div class="eyebrow">Ready when you are</div>
+      <h2>See every kilowatt, intelligently connected.</h2>
+      <a class="btn btn-cream" href="#/command">Get Started <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="lfoot"><span>Grid Charge — Smart EV Charging &amp; Localized Grid Management</span><span>All figures shown are simulated demo data.</span></div>
+  </section>
+</div>
+
+<div id="app" hidden></div>
+<div class="scrim" data-act="menu"></div>
+<div id="drawer" class="drawer-wrap" aria-live="polite"></div>
